@@ -1,0 +1,23 @@
+{
+    "SERVER_FAILURE_MESSAGE" : "Please try again later .",
+    "EMPTY_CACHE_FAILURE_MESSAGE" : "No Data",
+    "OFFLINE_FAILURE_MESSAGE" : "Please Check your Internet Connection",
+    "WRONG_LOGIN_MESSAGE" : "Username or Password is Wrong",
+    "UNEXPECTED_ERROR_MESSAGE" : "Unexpected Error , Please try again later .",
+    "LOGGED_OUT_SUCCESSFULLY" :"You have logged out successfully",
+    "EMPTY_USER": "Please Enter Username or Email",
+    "LOGIN_USER_HINT": "Username or Email",
+    "EMPTY_PASSWORD": "Please Enter Your Password",
+    "LOGIN_PASSWORD_HINT": "Password",
+    "LOGIN_BUTTON": "Login",
+    "NOTE_LOGIN_PAGE" : "Note : If you have another child you can login again with another school account",
+    "NOTE_SECOND_LOGIN" : "Please Login With Another School Account",
+    "HOME_PAGE_FLOAT_BUTTON": "School",
+    "HOME_PAGE_FLOAT_BUTTON2": "Child",
+    "APP_NAME": "Mederes",
+    "HOME_PAGE_GROUP_BY_SCHOOL": "School :",
+    "HOME_PAGE_CHILD_NAME": "Name :",
+    "HOME_PAGE_CHILD_BALANCE": "Balance is :",
+    "HOME_PAGE_CHILD_STATUE": "Active"
+
+}
