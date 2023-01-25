@@ -18,6 +18,10 @@
     "HOME_PAGE_GROUP_BY_SCHOOL": "School :",
     "HOME_PAGE_CHILD_NAME": "Name :",
     "HOME_PAGE_CHILD_BALANCE": "Balance is :",
-    "HOME_PAGE_CHILD_STATUE": "Active"
+    "HOME_PAGE_CHILD_STATUE": "Active",
+    "HOME_PAGE_BUTTON1": "Weekly Program",
+    "HOME_PAGE_BUTTON2": "Forbidden Food",
+    "HOME_PAGE_BUTTON3": "History"
+
 
 }

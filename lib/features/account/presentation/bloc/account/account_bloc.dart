@@ -30,7 +30,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       if (event is LoginEvent) {
         emit(LoadingState());
         final failureOrUser =
-            await login(event.usernameOrEmail, event.password);
+            await login(event.usernameOrEmail, event.password,event.isEmail);
         failureOrUser.fold((failure) {
           emit(ErrorMsgState(message: _mapFailureToMessage(failure)));
         }, (user) {
@@ -57,7 +57,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       else if(event is SecondLoginEvent)
         {
           emit(LoadingState());
-          final failureOrUser =await loginAgainUsecase (event.usernameOrEmail, event.password,);
+          final failureOrUser =await loginAgainUsecase (event.usernameOrEmail, event.password,event.isEmail);
           failureOrUser.fold((failure) {
             emit(ErrorMsgState(message: _mapFailureToMessage(failure)));
           }, (user) {

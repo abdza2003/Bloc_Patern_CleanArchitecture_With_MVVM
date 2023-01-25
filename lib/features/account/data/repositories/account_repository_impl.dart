@@ -30,14 +30,15 @@ class AccountRepositoryImpl implements AccountRepository {
 
   @override
   Future<Either<Failure, User>> login(
-      String userOrEmail, String password) async {
+      String userOrEmail, String password,bool isEmail) async {
     if (await networkInfo.isConnected) {
       try {
         CommonResponse loginResponse;
-        loginResponse = await remoteDataSource.login(userOrEmail, password);
+        loginResponse = await remoteDataSource.login(userOrEmail, password,isEmail);
         if (loginResponse.status) {
           UserModel userModel = UserModel.fromJson(loginResponse.data);
-          userModel.schools?.add(userModel.school!);
+          userModel.schools=[];
+          userModel.schools!.add(userModel.school!);
           await localDataSource.cacheUser(userModel);
           return Right(userModel);
         } else {
@@ -80,18 +81,18 @@ class AccountRepositoryImpl implements AccountRepository {
 
   @override
   Future<Either<Failure, User>> loginAgain(
-      String userOrEmail, String password) async {
+      String userOrEmail, String password,bool isEmail) async {
     if (await networkInfo.isConnected) {
       try {
         UserModel user = await localDataSource.getCachedUser();
         CommonResponse loginResponse;
-        loginResponse = await remoteDataSource.login(userOrEmail, password);
+        loginResponse = await remoteDataSource.login(userOrEmail, password,isEmail);
         if (loginResponse.status) {
           UserModel userModel = UserModel.fromJson(loginResponse.data);
           if (userModel.childern != null) {
             for (var child in userModel.childern!) {
               child.accessTokenParent = userModel.accessToken;
-              if (user.childern == null || !user.childern!.contains(child)) {
+              if (user.childern == null || !user.childern!.any((element) => element.id==child.id)) {
                 user.childern?.add(child);
               }
             }

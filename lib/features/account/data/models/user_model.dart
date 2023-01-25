@@ -17,7 +17,8 @@ class UserModel extends User {
       super.accessToken,
       super.childern,
       super.schools,
-      super.school});
+      super.school,
+      super.addChildren});
 
   UserModel.fromJson(Map<String, dynamic> json) {
       id = json['id'];
@@ -38,8 +39,15 @@ class UserModel extends User {
               childern!.add( ChildModel.fromJson(v));
           });
       }
+      if (json['schools'] != null) {
+          schools = <SchoolModel>[];
+          json['schools'].forEach((v) {
+              schools!.add( SchoolModel.fromJson(v));
+          });
+      }
       school =
       json['school'] != null ? SchoolModel.fromJson(json['school']) : null;
+      addChildren=json['add_children'];
   }
 
   Map<String, dynamic> toJson() {
@@ -56,8 +64,12 @@ class UserModel extends User {
       data['updated_at'] = updatedAt;
       data['uuid'] = uuid;
       data['accessToken'] = accessToken;
+      data['add_children'] =addChildren;
       if (childern != null) {
           data['childern'] = childern!.map((v) => v.toJson()).toList();
+      }
+      if (schools != null) {
+          data['schools'] = schools!.map((v) => v.toJson()).toList();
       }
       if (school != null) {
           data['school'] = school!.toJson();

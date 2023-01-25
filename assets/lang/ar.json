@@ -1,1 +1,27 @@
-{"hello_msg": " مرحباً"}
+{
+  "SERVER_FAILURE_MESSAGE" : "الرجاء المحاولة مرة أخرى",
+  "EMPTY_CACHE_FAILURE_MESSAGE" : "لا يوجد بيانات محفوظة",
+  "OFFLINE_FAILURE_MESSAGE" : "تأكد من اتصالك بالأنترنت",
+  "WRONG_LOGIN_MESSAGE" : "اسم المستخدم أو كلمة المرور خاطئة",
+  "UNEXPECTED_ERROR_MESSAGE" : "خطأ غير متوقع",
+  "LOGGED_OUT_SUCCESSFULLY" :"تم تسجيل الخروج بنجاح",
+  "EMPTY_USER": "الرجاء ادخال اسم المستخدم او كلة السر",
+  "LOGIN_USER_HINT": "اسم المستخدم أو الايميل",
+  "EMPTY_PASSWORD": "الرجاء ادخال كلمة المرور",
+  "LOGIN_PASSWORD_HINT": "كلمة المرور",
+  "LOGIN_BUTTON": "تسجيل الدخول",
+  "NOTE_LOGIN_PAGE" : "ملاحظة : اذا كان لديك طفل اخر يرجى تسجيل الدخول بحساب المدرسة الخاص به",
+  "NOTE_SECOND_LOGIN" : "الرجاء تسجيل الدخول بحساب اخر",
+  "HOME_PAGE_FLOAT_BUTTON": "المدرسة",
+  "HOME_PAGE_FLOAT_BUTTON2": "طفل",
+  "APP_NAME": "مدارس",
+  "HOME_PAGE_GROUP_BY_SCHOOL": "مدرسة :",
+  "HOME_PAGE_CHILD_NAME": "الاسم :",
+  "HOME_PAGE_CHILD_BALANCE": "الرصيد :",
+  "HOME_PAGE_CHILD_STATUE": "فعال",
+  "HOME_PAGE_BUTTON1": "البرنامج الاسبوعي",
+  "HOME_PAGE_BUTTON2": "الطعام الممنوع",
+  "HOME_PAGE_BUTTON3": "سجل الشراء"
+
+
+}

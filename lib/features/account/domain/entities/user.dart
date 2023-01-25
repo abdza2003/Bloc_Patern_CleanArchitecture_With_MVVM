@@ -18,6 +18,8 @@ class User {
   List<SchoolModel>? schools;
   SchoolModel? school;
   String? supervisorId;
+  bool? addChildren;
+
 
   User({this.id,
     this.name,
@@ -33,7 +35,8 @@ class User {
     this.accessToken,
     this.childern,
     this.school,
-    this.schools
+    this.schools,
+    this.addChildren
 
   });
 }

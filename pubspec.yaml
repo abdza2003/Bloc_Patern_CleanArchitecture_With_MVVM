@@ -32,6 +32,7 @@ dependencies:
   grouped_list:
   flutter_multi_formatter:
   flutter_speed_dial:
+  auto_size_text:
 dev_dependencies:
   flutter_test:
     sdk: flutter
