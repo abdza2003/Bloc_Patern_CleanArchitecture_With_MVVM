@@ -1,20 +1,35 @@
-import 'package:dartz/dartz.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
+
+import 'package:image_picker/image_picker.dart';
 import '../../../../core/network/api.dart';
 import '../../../../core/network/common_response.dart';
-import '../../domain/entities/child.dart';
 
 abstract class AccountRemoteDataSource {
   Future<dynamic> login(String userOrEmail,String password,bool isEmail);
   Future<dynamic> logout();
-  Future<dynamic> addChild(Child child);
+  Future<dynamic> addChild(String name,String userName,String password,String email,String mobile,XFile? image,String accessToken);
 }
 class AccountRemoteDataSourceImpl implements AccountRemoteDataSource
 {
   @override
-  Future<dynamic> addChild(Child child) {
-    // TODO: implement logout
-    throw UnimplementedError();
+  Future<dynamic> addChild(String name,String userName,String password,String email,String mobile,XFile? image, String accessToken) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name']=name;
+    data['user_name']=userName;
+    data['password']=password;
+    data['email']=email;
+    data['mobile']=mobile;
+    if (image==null)
+      {
+        return Network().postAuthData(data,"/user/store-student",accessToken).then((dynamic response) {
+          return CommonResponse<dynamic>.fromJson(response);
+        });
+      }
+    else {
+      return Network().postAuthImage("/user/store-student",data,File(image.path),image.name,"image",accessToken).then((dynamic response) {
+      return CommonResponse<dynamic>.fromJson(response);
+    });
+    }
   }
 
   @override

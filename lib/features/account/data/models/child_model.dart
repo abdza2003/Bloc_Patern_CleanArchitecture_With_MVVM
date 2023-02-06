@@ -1,8 +1,6 @@
 import 'package:school_cafteria/features/account/data/models/school_model.dart';
 import 'package:school_cafteria/features/account/domain/entities/child.dart';
 
-import '../../domain/entities/school.dart';
-
 class ChildModel extends Child{
 
   ChildModel({
@@ -20,7 +18,8 @@ class ChildModel extends Child{
   super.parentId,
   super.uuid,
   super.balance,
-    super.school
+    super.school,
+    super.accessTokenParent
 });
  ChildModel.fromJson(Map<String, dynamic> json) {
   id = json['id'];
@@ -36,6 +35,7 @@ class ChildModel extends Child{
   updatedAt = json['updated_at'];
   parentId = json['parent_id'];
   uuid = json['uuid'];
+  accessTokenParent=json["accessTokenParent"];
   balance = json['balance'];
   school =
   json['school'] != null ?  SchoolModel.fromJson(json['school']) : null; }
@@ -57,6 +57,7 @@ class ChildModel extends Child{
   data['uuid'] = uuid;
   data['balance'] = balance;
   data['school']=school;
+  data["accessTokenParent"]=accessTokenParent;
   return data;
  }
 

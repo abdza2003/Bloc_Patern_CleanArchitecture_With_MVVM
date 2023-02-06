@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:school_cafteria/features/products/domain/entities/products.dart';
+import 'package:school_cafteria/features/products/domain/entities/school_products.dart';
 import 'package:school_cafteria/features/products/domain/repositories/products_repository.dart';
 import '../../../../core/error/failures.dart';
 
@@ -8,7 +9,7 @@ class GetAllSchoolProductsUsecase {
 
   GetAllSchoolProductsUsecase(this.repository);
 
-  Future<Either<Failure, List<Product>>> call(int childId ) async {
-    return await repository.getAllSchoolProducts(childId);
+  Future<Either<Failure, SchoolProducts>> call(int childId,String accessToken ) async {
+    return await repository.getAllSchoolProducts(childId,accessToken);
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:school_cafteria/core/app_theme.dart';
 import 'package:school_cafteria/features/account/presentation/bloc/account/account_bloc.dart';
+import 'package:school_cafteria/features/products/presentation/bloc/products_bloc.dart';
 import 'package:school_cafteria/splash.dart';
 import 'package:sizer/sizer.dart';
 import 'injection_container.dart' as di;
@@ -26,6 +27,8 @@ class MyApp extends StatelessWidget {
               providers: [
               BlocProvider(
               create: (_) => di.sl<AccountBloc>()),
+                BlocProvider(
+              create: (_) => di.sl<ProductsBloc>()),
           ],
           child:MaterialApp(
         title: 'School Cafeteria',

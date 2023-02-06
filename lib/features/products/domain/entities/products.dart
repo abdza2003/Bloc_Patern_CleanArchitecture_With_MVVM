@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class Product extends Equatable {
+class Product  {
   int? id;
   String? name;
   String? barcode;
@@ -13,11 +13,9 @@ class Product extends Equatable {
   String? updatedAt;
   String? showOnMobile;
   int? quantity;
+  bool selected=false;
+  String isMarket="true";
 
-
-
-  @override
-  List<Object?> get props => [];
 
   Product({
       this.id,
@@ -31,5 +29,6 @@ class Product extends Equatable {
       this.createdAt,
       this.updatedAt,
       this.showOnMobile,
-      this.quantity});
+      this.quantity,
+  });
 }

@@ -29,6 +29,7 @@ int hexOfRGBA(int r,int g,int b,{double opacity=1})
 }
 
 final appTheme = ThemeData(
+    //fontFamily: "HELVE",
     appBarTheme: AppBarTheme(
       backgroundColor: primaryColor,
       centerTitle: true,

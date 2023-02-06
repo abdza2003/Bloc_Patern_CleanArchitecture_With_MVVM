@@ -21,7 +21,21 @@
     "HOME_PAGE_CHILD_STATUE": "Active",
     "HOME_PAGE_BUTTON1": "Weekly Program",
     "HOME_PAGE_BUTTON2": "Forbidden Food",
-    "HOME_PAGE_BUTTON3": "History"
-
-
+    "HOME_PAGE_BUTTON3": "History",
+    "HOME_PAGE_BUTTON4": "Add Balance",
+    "WRONG_REGISTRATION_DATA": "Please Check Your Data",
+    "ADD_SUCCESSFULLY" :"Student Added Successfully",
+    "REQUIRED_FIELD": "This Field is Required",
+    "ADD_CHILD_NAME_HINT": "Name",
+    "ADD_CHILD_USERNAME_HINT":"UserName",
+    "ADD_CHILD_EMAIL_HINT": "Email",
+    "ADD_CHILD_PASS_HINT":"Password",
+    "ADD_CHILD_MOBILE_HINT": "Mobile",
+    "ADD_CHILD_CHOOSE_IMAGE_NOTE":"Please Choose an Image for Your Child :",
+    "ADD_CHILD_CHOOSE_IMAGE_BTN": "Add Image",
+    "ADD_CHILD_SUBMIT_BTN":"Submit",
+    "ADD_CHILD_PAGE_TITLE": "Add Child",
+    "ADD_CHILD_PAGE_WRONG_NUMBER": "Please add a Valid PhoneNumber",
+    "PRODUCT_ITEM_DELETE": "Item Deleted Successfully",
+    "BANNED_PRODUCTS_ADDED": "Products Added to Ban Section"
 }

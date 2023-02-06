@@ -35,7 +35,9 @@ class Child extends Equatable {
       this.parentId,
       this.uuid,
       this.balance,
-      this.school});
+      this.school,
+      this.accessTokenParent
+      });
 
   @override
   // TODO: implement props

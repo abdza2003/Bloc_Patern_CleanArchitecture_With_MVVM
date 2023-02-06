@@ -33,6 +33,7 @@ dependencies:
   flutter_multi_formatter:
   flutter_speed_dial:
   auto_size_text:
+  image_picker:
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -41,7 +42,15 @@ dev_dependencies:
 
 
 flutter:
-
+  fonts:
+    - family: HELVE
+      fonts:
+        - asset: assets/fonts/helv/HELVETICANEUELTARABIC-LIGHT.TTF
+          weight: 300
+        - asset: assets/fonts/helv/HELVETICANEUELTARABIC-ROMAN.TTF
+          weight: 400
+        - asset: assets/fonts/helv/HELVETICANEUELTARABIC-BOLD.TTF
+          weight: 500
   uses-material-design: true
   assets:
     - assets/images/

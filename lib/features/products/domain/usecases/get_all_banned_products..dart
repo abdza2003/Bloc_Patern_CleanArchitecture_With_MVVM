@@ -8,7 +8,7 @@ class GetAllBannedProductsUsecase {
 
   GetAllBannedProductsUsecase(this.repository);
 
-  Future<Either<Failure, List<Product>>> call(int childId ) async {
-    return await repository.getAllBannedProducts(childId);
+  Future<Either<Failure, List<Product>>> call(int childId ,String accessToken) async {
+    return await repository.getAllBannedProducts(childId,accessToken);
   }
 }

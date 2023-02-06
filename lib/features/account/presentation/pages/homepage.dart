@@ -7,10 +7,13 @@ import 'package:school_cafteria/app_localizations.dart';
 import 'package:school_cafteria/core/app_theme.dart';
 import 'package:school_cafteria/features/account/data/models/child_model.dart';
 import 'package:school_cafteria/features/account/presentation/pages/Account/loginpage.dart';
+import 'package:school_cafteria/features/account/presentation/pages/add_child_page.dart';
+import 'package:school_cafteria/features/products/presentation/bloc/products_bloc.dart' as pb;
 import 'package:sizer/sizer.dart';
 import '../../../../core/navigation.dart';
 import '../../../../core/network/api.dart';
 import '../../../../core/util/snackbar_message.dart';
+import '../../../products/presentation/pages/banned_products_page.dart';
 import '../../domain/entities/user.dart';
 import '../bloc/account/account_bloc.dart';
 
@@ -35,14 +38,15 @@ class HomePage extends StatelessWidget {
         child: Scaffold(
             floatingActionButton: _getFAB(true, context),
             appBar: AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: () {
+                  BlocProvider.of<AccountBloc>(context).add(LogoutEvent());
+                },
+              ),
               actions: [
-                IconButton(
-                  icon: const Icon(Icons.logout),
-                  onPressed: () {
-                    BlocProvider.of<AccountBloc>(context).add(LogoutEvent());
-                  },
-                ),
-                IconButton(onPressed: () {}, icon: const Icon(Icons.history)),
+
+                ElevatedButton.icon(onPressed: () {}, icon: const Icon(Icons.history), label: Text("Payment"),),
               ],
               title: Text(
                 "APP_NAME".tr(context),
@@ -77,22 +81,27 @@ class HomePage extends StatelessWidget {
                     ),
                 itemBuilder: (context, ChildModel childModel) {
                   final name = TextEditingController();
-                  name.text="mohammad alaa hallabo hallabo hallabo";
+                  name.text=childModel.name!;
                   final balance = TextEditingController();
                   balance.text=toCurrencyString(
                                   childModel.balance.toString(),
-                                  trailingSymbol: "TUR",
+                                  trailingSymbol: childModel.school!.currencyName!,
                                   useSymbolPadding: true);
                   return SizedBox(
                     height: 30.h,
                     child: Container(
                       decoration: BoxDecoration(boxShadow: [
                         BoxShadow(
-                          color: pc2.withOpacity(0.3),
+                          color: pc2.withOpacity(0.1),
                           blurRadius: 20.0,
                         )
                       ]),
-                      child: Card(
+                      child: ClipRect(
+                  child:Banner(
+                  message: childModel.isActive=="1"?"Active":"Not Active",
+                  location: BannerLocation.topStart,
+                  color: childModel.isActive=="1"?Colors.green:Colors.redAccent,
+                  child:Card(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(25.0)),
                         elevation: 10,
@@ -116,24 +125,7 @@ class HomePage extends StatelessWidget {
                                         childModel.image!),
                                     width: 30.w,
                                     )),
-                                  // Container(
-                                  //   decoration: BoxDecoration,
-                                  // )
 
-                                  // Row(
-                                  //   children: [
-                                  //     Icon(Icons.account_balance_wallet),
-                                  //     SizedBox(width: 5.w,),
-                                  //     Text(
-                                  //           toCurrencyString(
-                                  //               childModel.balance.toString(),
-                                  //               trailingSymbol: "TUR",
-                                  //               useSymbolPadding: true),
-                                  //       style: TextStyle(
-                                  //           color: Colors.black, fontSize: 11.sp),
-                                  //     ),
-                                  //   ],
-                                  // ),
                                 ],
                               ),
                             ),
@@ -207,7 +199,12 @@ class HomePage extends StatelessWidget {
                                           shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.circular(15.0)),
                                         ),
-                                        onPressed: () {},
+                                        onPressed: () {
+
+                                          BlocProvider.of<pb.ProductsBloc>(context).add(pb.GetAllBannedProductsEvent(childModel.id!, childModel.accessTokenParent!));
+                                          Go.to(context,BannedProducts(accessToken:childModel.accessTokenParent!,childId:childModel.id!,currency:childModel.school!.currencyName!));
+
+                                        },
                                         icon: Icon(
                                           // <-- Icon
                                           Icons.not_interested,
@@ -255,11 +252,11 @@ class HomePage extends StatelessWidget {
                                         onPressed: () {},
                                         icon: Icon(
                                           // <-- Icon
-                                          Icons.receipt,
+                                          Icons.monetization_on_outlined,
                                           size: 16.sp,
                                         ),
                                         label: Text(
-                                          "HOME_PAGE_BUTTON3".tr(context),
+                                          "HOME_PAGE_BUTTON4".tr(context),
                                           style: TextStyle(fontSize: 9.sp),
                                         ), // <-- Text
                                       ),
@@ -271,103 +268,9 @@ class HomePage extends StatelessWidget {
 
                           ],
                         ),
-                        // child: Column(
-                        //   children: [
-                        //     Row(mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        //       children: [
                         //
-                        //         Column(
-                        //           children: [
-                        //             Text(
-                        //               "HOME_PAGE_CHILD_NAME".tr(context) + childModel.name!,
-                        //               style: TextStyle(fontSize: 15.sp),
-                        //             ),
-                        //             SizedBox(height: 2.h,),
-                        //             Row(
-                        //               children: [
-                        //                 Text(
-                        //                   "HOME_PAGE_CHILD_BALANCE".tr(context) + toCurrencyString(childModel.balance.toString(),trailingSymbol: "TUR",useSymbolPadding:true),
-                        //                   style: TextStyle(
-                        //                       color: Colors.black54, fontSize: 11.sp),
-                        //                 ),
-                        //                 IconButton(onPressed: (){}, icon: Icon(
-                        //                     Icons.add_circle_outline,))
-                        //               ],
-                        //             ),
-                        //             SizedBox(height: 2.h,),
-                        //             Row(
-                        //               children: [
-                        //                 const Icon(
-                        //                   Icons.check_circle,
-                        //                   color: Colors.green,
-                        //                 ),
-                        //                 SizedBox(
-                        //                   width: 5.w,
-                        //                 ),
-                        //                 Text("HOME_PAGE_CHILD_STATUE".tr(context)),
-                        //               ],
-                        //             )
-                        //           ],
-                        //         ),
-                        //         Column(
-                        //           children:[ childModel.image == null
-                        //               ? Image.asset(
-                        //                   'assets/launcher/logo.png',
-                        //                   scale: 15.0,
-                        //                 )
-                        //               : Image(
-                        //                   image: NetworkImage(
-                        //                       Network().baseUrl + childModel.image!),
-                        //                   height: 20.h,
-                        //                   width: 25.w,
-                        //                 ),
-                        //         ]),
-                        //
-                        //       ],
-                        //     ),
-                        //     Row(
-                        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //       children: [
-                        //         ElevatedButton.icon(
-                        //           onPressed: () {},
-                        //           icon: Icon( // <-- Icon
-                        //             Icons.calendar_month,
-                        //             size: 11.sp,
-                        //           ),
-                        //           label: Text("HOME_PAGE_BUTTON1".tr(context),style: TextStyle(fontSize: 8.sp),), // <-- Text
-                        //         ),ElevatedButton.icon(
-                        //           onPressed: () {},
-                        //           icon: Icon( // <-- Icon
-                        //             Icons.not_interested,
-                        //             size: 11.sp,
-                        //           ),
-                        //           label: Text("HOME_PAGE_BUTTON2".tr(context),style: TextStyle(fontSize: 8.sp),), // <-- Text
-                        //         ),ElevatedButton.icon(
-                        //           onPressed: () {},
-                        //           icon: Icon( // <-- Icon
-                        //             Icons.receipt,
-                        //             size: 11.sp,
-                        //           ),
-                        //           label: Text("HOME_PAGE_BUTTON3".tr(context),style: TextStyle(fontSize: 8.sp),), // <-- Text
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ],
-                        // ),
-                        // child: ListTile(
-                        //   minLeadingWidth: 20.w,
-                        //   trailing: user.childern![index]
-                        //         .image == null ? Image.asset('assets/launcher/logo.png',
-                        //       scale: 15.0,) : Image(image: NetworkImage(
-                        //         Network().baseUrl + user.childern![index]
-                        //             .image!), height: 10.h, width: 20.w,),
-                        //     onTap: (){},
-                        //   title: Text(user.childern![index].name!),
-                        //   subtitle: Text(user.childern![index].balance.toString()),
-                        // ),
                       ),
-                    ),
-                  );
+                    ))));
                 })));
   }
 
@@ -397,7 +300,26 @@ class HomePage extends StatelessWidget {
             visible: canAdd,
             child: const Icon(Icons.child_care),
             //backgroundColor: Color(0xFF801E48),
-            onTap: () {},
+            onTap: ()=>showDialog(context: context, builder: (BuildContext context){
+                return AlertDialog(
+                  title:  Text("Choose a School",style: TextStyle(color: primaryColor),),
+                  content: SizedBox(
+                  height: 30.h, // Change as per your requirement
+                  width: 30.w,
+              child:ListView.separated(
+                  shrinkWrap: true,
+                  separatorBuilder: (context, index) => const Divider(thickness: 1),
+                itemCount: user.schools!.length,
+                itemBuilder:(context,index){
+                return ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    side: BorderSide(color: primaryColor)
+                  ),
+                    onPressed: ()=>Go.off(context, AddChild(accessToken: user.schools![index].accessToken!)),
+                    child: Text(user.schools![index].name!,style: TextStyle(fontSize: 17.sp,color:primaryColor )));
+                })));}),
+              //Go.to(context, const AddChild());
             label: "HOME_PAGE_FLOAT_BUTTON2".tr(context),
             labelStyle: TextStyle(
                 fontWeight: FontWeight.w500,

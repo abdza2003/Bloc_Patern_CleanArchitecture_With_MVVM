@@ -7,7 +7,7 @@ class DeleteBannedProductsUsecase {
 
   DeleteBannedProductsUsecase(this.repository);
 
-  Future<Either<Failure, Unit>> call(int productId, int childId ) async {
-    return await repository.deleteBannedProducts(productId,childId);
+  Future<Either<Failure, Unit>> call(int productId, int childId,String accessToken ) async {
+    return await repository.deleteBannedProducts(productId,childId,accessToken);
   }
 }

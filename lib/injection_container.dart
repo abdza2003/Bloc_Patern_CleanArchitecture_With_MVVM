@@ -3,6 +3,14 @@ import 'package:school_cafteria/features/account/data/datasources/account_remote
 import 'package:school_cafteria/features/account/data/repositories/account_repository_impl.dart';
 import 'package:school_cafteria/features/account/domain/repositories/account_repository.dart';
 import 'package:school_cafteria/features/account/domain/usecases/account_check_login.dart';
+import 'package:school_cafteria/features/products/data/datasources/products_remote_datasource.dart';
+import 'package:school_cafteria/features/products/data/repositories/products_repository_impl.dart';
+import 'package:school_cafteria/features/products/domain/repositories/products_repository.dart';
+import 'package:school_cafteria/features/products/domain/usecases/delete_banned_products.dart';
+import 'package:school_cafteria/features/products/domain/usecases/get_all_banned_products..dart';
+import 'package:school_cafteria/features/products/domain/usecases/get_all_school_products..dart';
+import 'package:school_cafteria/features/products/domain/usecases/store_banned_products.dart';
+import 'package:school_cafteria/features/products/presentation/bloc/products_bloc.dart';
 
 import 'core/network/network_info.dart';
 import 'package:get_it/get_it.dart';
@@ -23,8 +31,8 @@ Future<void> init() async {
 
 // Bloc
 
-  sl.registerFactory(() => AccountBloc(login: sl(),logout:sl(), checkLoginUsecase: sl(), loginAgainUsecase: sl()));
-
+  sl.registerFactory(() => AccountBloc(login: sl(),logout:sl(), checkLoginUsecase: sl(), loginAgainUsecase: sl(), accountAddChildUsecase: sl()));
+  sl.registerFactory(() => ProductsBloc(storeBannedProductsUsecase: sl(), getAllSchoolProductsUsecase: sl(), getAllBannedProductsUsecase: sl(), deleteBannedProductsUsecase: sl()));
 
 // Usecases
 
@@ -33,19 +41,31 @@ Future<void> init() async {
   sl.registerLazySingleton(() => AccountCheckLoginUsecase(sl()));
   sl.registerLazySingleton(() => AccountLogoutUsecase(sl()));
   sl.registerLazySingleton(() => AccountLoginAgainUsecase(sl()));
-
+//Usecases2
+  sl.registerLazySingleton(() => StoreBannedProductsUsecase(sl()));
+  sl.registerLazySingleton(() => DeleteBannedProductsUsecase(sl()));
+  sl.registerLazySingleton(() => GetAllBannedProductsUsecase(sl()));
+  sl.registerLazySingleton(() => GetAllSchoolProductsUsecase(sl()));
 // Repository
 
   sl.registerLazySingleton<AccountRepository>(() => AccountRepositoryImpl(
       remoteDataSource: sl(), networkInfo: sl(),localDataSource: sl()));
+// Repository 2
+
+  sl.registerLazySingleton<ProductsRepository>(() => ProductRepositoryImpl(remoteDataSource: sl(), networkInfo: sl()));
 
 // Datasources
 
   sl.registerLazySingleton<AccountRemoteDataSource>(
       () => AccountRemoteDataSourceImpl());
+
    sl.registerLazySingleton<AccountLocalDataSource>(
        () => AccountLocalDataSourceImpl(sharedPreferences: sl()));
 
+// Datasources 2
+
+  sl.registerLazySingleton<ProductsRemoteDataSource>(
+          () => ProductsRemoteDataSourceImpl());
 //! Core
 
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
