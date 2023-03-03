@@ -19,7 +19,8 @@ class ChildModel extends Child{
   super.uuid,
   super.balance,
     super.school,
-    super.accessTokenParent
+    super.accessTokenParent,
+    super.weeklyBalance
 });
  ChildModel.fromJson(Map<String, dynamic> json) {
   id = json['id'];
@@ -37,6 +38,7 @@ class ChildModel extends Child{
   uuid = json['uuid'];
   accessTokenParent=json["accessTokenParent"];
   balance = json['balance'];
+  weeklyBalance =json['weekly_balance'];
   school =
   json['school'] != null ?  SchoolModel.fromJson(json['school']) : null; }
 
@@ -56,6 +58,7 @@ class ChildModel extends Child{
   data['parent_id'] = parentId;
   data['uuid'] = uuid;
   data['balance'] = balance;
+  data['weekly_balance']=weeklyBalance;
   data['school']=school;
   data["accessTokenParent"]=accessTokenParent;
   return data;

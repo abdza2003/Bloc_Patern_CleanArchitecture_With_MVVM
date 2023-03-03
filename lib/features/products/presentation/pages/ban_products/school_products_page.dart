@@ -1,18 +1,19 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:grouped_list/grouped_list.dart';
+import 'package:school_cafteria/app_localizations.dart';
 import 'package:school_cafteria/features/products/data/models/products_model.dart';
 import 'package:school_cafteria/features/products/data/models/selected_products_model.dart';
 import 'package:school_cafteria/features/products/domain/entities/products.dart';
-import 'package:school_cafteria/features/products/presentation/pages/banned_products_page.dart';
 import 'package:sizer/sizer.dart';
-import '../../../../core/app_theme.dart';
-import '../../../../core/navigation.dart';
-import '../../../../core/network/api.dart';
-import '../../../../core/util/snackbar_message.dart';
-import '../../../../core/widgets/loading_widget.dart';
-import '../bloc/products_bloc.dart';
+import '../../../../../core/app_theme.dart';
+import '../../../../../core/navigation.dart';
+import '../../../../../core/network/api.dart';
+import '../../../../../core/util/snackbar_message.dart';
+import '../../../../../core/widgets/loading_widget.dart';
+import '../../bloc/products_bloc.dart';
 
 class AddBannedProducts extends StatefulWidget {
   const AddBannedProducts({Key? key, required this.accessToken,required this.childId,required this.currency})
@@ -37,7 +38,7 @@ class MyPageState extends State<AddBannedProducts> {
         SnackBarMessage()
             .showSuccessSnackBar(message: state.message, context: context);
         BlocProvider.of<ProductsBloc>(context).add(GetAllBannedProductsEvent(widget.childId,widget.accessToken));
-        Go.off(context, BannedProducts(accessToken: widget.accessToken,childId: widget.childId,currency: widget.currency,));
+        Go.back(context);
       }
     }, builder: (context, state) {
       if (state is LoadingState) {
@@ -65,11 +66,11 @@ class MyPageState extends State<AddBannedProducts> {
                 selectedProductsModel.id=widget.childId;
                 BlocProvider.of<ProductsBloc>(context).add(StoreBannedProductsEvent(selectedProductsModel, widget.accessToken));
               },
-              child: Text("Add Products"),
+              child: Text("PRODUCT_NAV_BOTTOM".tr(context)),
             ),
           ),
           appBar: AppBar(
-            title: Text("Select Products to get banned"),
+            title: Text("SELECT_BANNED_PRODUCTS_TITLE".tr(context)),
           ),
           body: state.products.isEmpty
               ? const SizedBox()
@@ -98,7 +99,7 @@ class MyPageState extends State<AddBannedProducts> {
                             ),
                             Text(
                               //isMarket,
-                              isMarket == "true" ? "Market" : "Restaurant",
+                              isMarket == "true" ? "MARKET_GROUP_VIEW".tr(context) : "RESTAURANT_GROUP_VIEW".tr(context),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   fontSize: 15.sp, fontWeight: FontWeight.w400),
@@ -119,11 +120,11 @@ class MyPageState extends State<AddBannedProducts> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Padding(
-                              padding: EdgeInsets.all(0.5.h),
+                              padding: EdgeInsets.all(0.4.h),
                               child: ConstrainedBox(
                                   constraints: BoxConstraints(
-                                    minWidth: 30.w,
-                                    maxWidth: 30.w,
+                                    minWidth: 35.w,
+                                    maxWidth: 35.w,
                                     maxHeight: 20.h,
                                     minHeight: 20.h,
                                   ),
@@ -144,11 +145,11 @@ class MyPageState extends State<AddBannedProducts> {
                               children: <Widget>[
                                 SizedBox(
                                   width:
-                                      MediaQuery.of(context).size.width * 0.5,
+                                  MediaQuery.of(context).size.width * 0.41,
                                   child: Padding(
                                     padding:
                                         EdgeInsets.fromLTRB(1.w, 1.h, 0, 0),
-                                    child: Text(
+                                    child: AutoSizeText(
                                       product.name!,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -159,11 +160,12 @@ class MyPageState extends State<AddBannedProducts> {
                                 ),
                                 SizedBox(
                                   width:
-                                      MediaQuery.of(context).size.width * 0.5,
+                                  MediaQuery.of(context).size.width * 0.41,
+                                  height: 9.h,
                                   child: Padding(
                                     padding:
                                         EdgeInsets.fromLTRB(1.w, 1.h, 0, 0),
-                                    child: Text(
+                                    child: AutoSizeText(
                                       product.description ?? product.name!,
                                       style: TextStyle(
                                         fontSize: 11.sp,
@@ -182,13 +184,13 @@ class MyPageState extends State<AddBannedProducts> {
                                         trailingSymbol: widget.currency,
                                         useSymbolPadding: true),
                                     style: TextStyle(
-                                        fontSize: 9.2.sp,
+                                        fontSize: 11.sp,
                                         fontWeight: FontWeight.bold),
                                   ),
                                 ),
                                 Padding(
                                     padding:
-                                        EdgeInsets.fromLTRB(2.w, 1.h, 0, 0),
+                                        EdgeInsets.fromLTRB(2.w, 2.h, 0, 0),
                                     child: InkWell(
                                         onTap: () {
                                           setState(() {

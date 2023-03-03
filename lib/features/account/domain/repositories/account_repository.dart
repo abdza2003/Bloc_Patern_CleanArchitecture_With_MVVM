@@ -7,6 +7,7 @@ abstract class AccountRepository {
   Future<Either<Failure, User>> login(String userOrEmail,String password,bool isEmail);
   Future<Either<Failure, Unit>> logout();
   Future<Either<Failure, User>> loginAgain(String userOrEmail,String password,bool isEmail);
+  Future<Either<Failure, User>> refresh(List<String> accessTokens);
   Future<Either<Failure, User>> checkLogin();
   Future<Either<Failure, Unit>> addChild(String name,String userName,String password,String email,String mobile,XFile? image,String accessToken);
 }

@@ -16,14 +16,12 @@ class AccountRepositoryImpl implements AccountRepository {
   late final AccountLocalDataSource localDataSource;
   late final NetworkInfo networkInfo;
 
-  AccountRepositoryImpl(
-      {required this.remoteDataSource,
-      required this.networkInfo,
-      required this.localDataSource});
+  AccountRepositoryImpl({required this.remoteDataSource,
+    required this.networkInfo,
+    required this.localDataSource});
 
   @override
-  Future<Either<Failure, Unit>> addChild(
-      String name,
+  Future<Either<Failure, Unit>> addChild(String name,
       String userName,
       String password,
       String email,
@@ -34,7 +32,13 @@ class AccountRepositoryImpl implements AccountRepository {
       try {
         CommonResponse loginResponse;
         loginResponse = await remoteDataSource.addChild(
-            name, userName, password, email, mobile, image, accessToken);
+            name,
+            userName,
+            password,
+            email,
+            mobile,
+            image,
+            accessToken);
         if (loginResponse.status) {
           return const Right(unit);
         } else {
@@ -49,22 +53,22 @@ class AccountRepositoryImpl implements AccountRepository {
   }
 
   @override
-  Future<Either<Failure, User>> login(
-      String userOrEmail, String password, bool isEmail) async {
+  Future<Either<Failure, User>> login(String userOrEmail, String password,
+      bool isEmail) async {
     if (await networkInfo.isConnected) {
       try {
         CommonResponse loginResponse;
         loginResponse =
-            await remoteDataSource.login(userOrEmail, password, isEmail);
+        await remoteDataSource.login(userOrEmail, password, isEmail);
         if (loginResponse.status) {
           UserModel userModel = UserModel.fromJson(loginResponse.data);
           userModel.school!.accessToken = userModel.accessToken;
           userModel.schools = [];
           userModel.schools!.add(userModel.school!);
           if (userModel.childern != null) {
-          for (var v = 0; v<userModel.childern!.length; v++) {
-            userModel.childern![v].accessTokenParent=userModel.accessToken;
-          }
+            for (var v = 0; v < userModel.childern!.length; v++) {
+              userModel.childern![v].accessTokenParent = userModel.accessToken;
+            }
           }
           await localDataSource.cacheUser(userModel);
           return Right(userModel);
@@ -86,7 +90,7 @@ class AccountRepositoryImpl implements AccountRepository {
       logoutResponse = await remoteDataSource.logout();
       if (logoutResponse.status) {
         SharedPreferences sharedPreferences =
-            await SharedPreferences.getInstance();
+        await SharedPreferences.getInstance();
         await sharedPreferences.clear();
         return const Right(unit);
       } else {
@@ -108,14 +112,14 @@ class AccountRepositoryImpl implements AccountRepository {
   }
 
   @override
-  Future<Either<Failure, User>> loginAgain(
-      String userOrEmail, String password, bool isEmail) async {
+  Future<Either<Failure, User>> loginAgain(String userOrEmail, String password,
+      bool isEmail) async {
     if (await networkInfo.isConnected) {
       try {
         UserModel user = await localDataSource.getCachedUser();
         CommonResponse loginResponse;
         loginResponse =
-            await remoteDataSource.login(userOrEmail, password, isEmail);
+        await remoteDataSource.login(userOrEmail, password, isEmail);
         if (loginResponse.status) {
           UserModel userModel = UserModel.fromJson(loginResponse.data);
           userModel.school!.accessToken = userModel.accessToken;
@@ -138,6 +142,36 @@ class AccountRepositoryImpl implements AccountRepository {
         return Left(ServerFailure());
       }
     } else {
+      return Left(OfflineFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> refresh(List<String> accessTokens) async {
+    if (await networkInfo.isConnected) {
+      try {
+        UserModel user = await localDataSource.getCachedUser();
+        user.childern = [];
+        for (var login in accessTokens) {
+          CommonResponse loginResponse;
+          loginResponse = await remoteDataSource.refresh(login);
+          UserModel userModel = UserModel.fromJson(loginResponse.data);
+          userModel.school!.accessToken = userModel.accessToken;
+          if (userModel.childern != null) {
+            for (var child in userModel.childern!) {
+              child.accessTokenParent = login;
+              user.childern!.add(child);
+            }
+          }
+        }
+        localDataSource.cacheUser(user);
+        return Right(user);
+      }
+      on ServerException {
+        return Left(ServerFailure());
+      }
+    }
+    else {
       return Left(OfflineFailure());
     }
   }

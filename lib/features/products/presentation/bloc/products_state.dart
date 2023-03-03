@@ -29,6 +29,27 @@ class LoadedBannedState extends ProductsState {
 
 
 }
+class LoadedSchoolDaysState extends ProductsState {
+  final WeekDays weekDays;
+
+  LoadedSchoolDaysState({ required this.weekDays});
+
+
+}
+class LoadedSchoolProductsByPriceState extends ProductsState {
+  final List<ProductModel> products;
+
+  LoadedSchoolProductsByPriceState({ required this.products});
+
+
+}
+class LoadedDayProductsState extends ProductsState {
+  final List<Product> products;
+
+  LoadedDayProductsState({ required this.products});
+
+
+}
 class LoadedProductsSchoolState extends ProductsState {
   final List<ProductModel> products;
 

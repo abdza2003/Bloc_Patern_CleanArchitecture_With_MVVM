@@ -7,6 +7,7 @@ import '../../../../core/network/common_response.dart';
 abstract class AccountRemoteDataSource {
   Future<dynamic> login(String userOrEmail,String password,bool isEmail);
   Future<dynamic> logout();
+  Future<dynamic> refresh(String accessToken);
   Future<dynamic> addChild(String name,String userName,String password,String email,String mobile,XFile? image,String accessToken);
 }
 class AccountRemoteDataSourceImpl implements AccountRemoteDataSource
@@ -45,6 +46,13 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource
   @override
   Future<dynamic> logout() async {
     return Network().postAuthData(null,"/user/logout",null).then((dynamic response) {
+      return CommonResponse<dynamic>.fromJson(response);
+    });
+  }
+
+  @override
+  Future refresh(String accessToken) {
+    return Network().getAuthData("/user/get-user-children",accessToken).then((dynamic response) {
       return CommonResponse<dynamic>.fromJson(response);
     });
   }

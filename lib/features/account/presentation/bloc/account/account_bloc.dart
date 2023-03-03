@@ -10,6 +10,7 @@ import '../../../domain/usecases/account_add_child.dart';
 import '../../../domain/usecases/account_login.dart';
 import '../../../domain/usecases/account_login_again.dart';
 import '../../../domain/usecases/account_logout.dart';
+import '../../../domain/usecases/account_refresh.dart';
 
 part 'account_event.dart';
 
@@ -21,8 +22,10 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final AccountLogoutUsecase logout;
   final AccountCheckLoginUsecase checkLoginUsecase;
   final AccountAddChildUsecase accountAddChildUsecase;
+  final AccountRefreshUsecase accountRefreshUsecase;
 
   AccountBloc({
+    required this.accountRefreshUsecase,
     required this.login,
     required this.logout,
     required this.checkLoginUsecase,
@@ -83,6 +86,16 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         }, (_) {
           emit(SuccessMsgState(message: AppLocalizations.instance
               .translate("ADD_SUCCESSFULLY")));
+        });
+      }
+      else if (event is RefreshEvent) {
+        emit(LoadingState());
+        final failureOrUser =
+        await accountRefreshUsecase(event.accessTokens);
+        failureOrUser.fold((failure) {
+          emit(ErrorMsgState(message: _mapFailureToMessage(failure)));
+        }, (user) {
+          emit(LoggedInState(user: user));
         });
       }
     });

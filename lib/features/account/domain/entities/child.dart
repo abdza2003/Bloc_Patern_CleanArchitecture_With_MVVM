@@ -16,7 +16,8 @@ class Child extends Equatable {
   String? updatedAt;
   String? parentId;
   String? uuid;
-  int? balance;
+  dynamic balance;
+  dynamic weeklyBalance;
   String? accessTokenParent;
   SchoolModel? school;
 
@@ -36,7 +37,8 @@ class Child extends Equatable {
       this.uuid,
       this.balance,
       this.school,
-      this.accessTokenParent
+      this.accessTokenParent,
+        this.weeklyBalance
       });
 
   @override

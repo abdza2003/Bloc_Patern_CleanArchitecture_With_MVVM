@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:school_cafteria/core/app_theme.dart';
 import 'package:school_cafteria/features/account/presentation/bloc/account/account_bloc.dart';
+import 'package:school_cafteria/features/balance/presentation/bloc/balance_bloc.dart';
 import 'package:school_cafteria/features/products/presentation/bloc/products_bloc.dart';
 import 'package:school_cafteria/splash.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'injection_container.dart' as di;
 import 'app_localizations.dart';
@@ -12,11 +14,34 @@ import 'app_localizations.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+
+  static _MyAppState? of(BuildContext context) => context.findAncestorStateOfType<_MyAppState>();
+}
+
+class _MyAppState extends State<MyApp> {
+   Locale? _locale;
+
+   @override
+  void initState()  {
+     getLocale();
+    super.initState();
+  }
+  void setLocale(Locale value) {
+    setState(() {
+      _locale = value;
+    });
+  }
+  void getLocale()
+  async {
+    SharedPreferences local =await SharedPreferences.getInstance();
+    setLocale(Locale(local.getString("lang")??"en"));
+  }
 
   // This widget is the root of your application.
   @override
@@ -29,6 +54,8 @@ class MyApp extends StatelessWidget {
               create: (_) => di.sl<AccountBloc>()),
                 BlocProvider(
               create: (_) => di.sl<ProductsBloc>()),
+                BlocProvider(
+              create: (_) => di.sl<BalanceBloc>()),
           ],
           child:MaterialApp(
         title: 'School Cafeteria',
@@ -40,16 +67,17 @@ class MyApp extends StatelessWidget {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate
         ],
-        localeResolutionCallback: (deviceLocale, supportedLocales) {
-          for (var locale in supportedLocales) {
-            if (deviceLocale != null &&
-                deviceLocale.languageCode == locale.languageCode) {
-              return deviceLocale;
-            }
-          }
-
-          return supportedLocales.first;
-        },
+              locale: _locale ,
+        // localeResolutionCallback: (deviceLocale, supportedLocales) {
+        //   for (var locale in supportedLocales) {
+        //     if (deviceLocale != null &&
+        //         deviceLocale.languageCode == locale.languageCode) {
+        //       return deviceLocale;
+        //     }
+        //   }
+        //
+        //   return supportedLocales.first;
+        // },
         home:const Splash()
       ));
     });

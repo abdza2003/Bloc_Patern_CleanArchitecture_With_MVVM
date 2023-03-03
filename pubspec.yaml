@@ -34,6 +34,9 @@ dependencies:
   flutter_speed_dial:
   auto_size_text:
   image_picker:
+  rename:
+  simple_animations: ^3.0.0
+  counter_button: ^1.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

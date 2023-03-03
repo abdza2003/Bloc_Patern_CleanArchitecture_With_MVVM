@@ -23,6 +23,9 @@
     "HOME_PAGE_BUTTON2": "Forbidden Food",
     "HOME_PAGE_BUTTON3": "History",
     "HOME_PAGE_BUTTON4": "Add Balance",
+    "HOME_PAGE_BUTTON5": "Payment",
+    "CHILD_ACTIVE": "Active",
+    "CHILD_NOT_ACTIVE": "Not Active",
     "WRONG_REGISTRATION_DATA": "Please Check Your Data",
     "ADD_SUCCESSFULLY" :"Student Added Successfully",
     "REQUIRED_FIELD": "This Field is Required",
@@ -37,5 +40,31 @@
     "ADD_CHILD_PAGE_TITLE": "Add Child",
     "ADD_CHILD_PAGE_WRONG_NUMBER": "Please add a Valid PhoneNumber",
     "PRODUCT_ITEM_DELETE": "Item Deleted Successfully",
-    "BANNED_PRODUCTS_ADDED": "Products Added to Ban Section"
+    "BANNED_PRODUCTS_ADDED": "Products Added to Ban Section",
+    "PRODUCTS_ADDED": "Products Added",
+    "CHOOSE_SCHOOL": "Choose a School",
+    "BANNED_PRODUCTS_TITLE": "Banned Products",
+    "BANNED_PRODUCTS_NOT_FOUND": "There is No Banned Products",
+    "PRODUCT_NAV_BOTTOM" : "Add Products",
+    "SELECT_BANNED_PRODUCTS_TITLE": "Select Products to get banned",
+    "MARKET_GROUP_VIEW": "Market",
+    "RESTAURANT_GROUP_VIEW": "Restaurant",
+    "NO_PRODUCT_FOUND_PAGE" : "Sorry, we couldn\\'t find any Products",
+    "NO_PRODUCT_FOUND" : "There is no Products",
+    "SCHOOL_DAYS_APPBAR" : "School Days",
+    "SCHOOL_DAYS_TOTAL_MONEY": "Total: ",
+    "SCHOOL_DAYS_TOTAL_PRODUCT": "Products Count: ",
+    "DAY_PRODUCTS_TITLE": " Products",
+    "DIALOG_BUTTON_SEARCH": "Search",
+    "DIALOG_BUTTON_CANCEL": "Cancel",
+    "DIALOG_SEARCH_PRICE_TITLE": "Choose Day Balance",
+    "DIALOG_SEARCH_PRICE_TEXT_HINT": "Balance",
+    "PRODUCTS_BY_PRICE_TITLE_NOT_FOUND" : "No Product found Under ",
+    "PRODUCTS_BY_PRICE_TITLE" : "Products Under ",
+    "DIALOG_CONFIRMATION_TITLE": "Exceeded Expected Price",
+    "DIALOG_CONFIRMATION_CONTENT": "The Selected Products Price is ",
+    "DIALOG_CONFIRMATION_BUTTON1": "Confirm"
+
+
+
 }

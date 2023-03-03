@@ -18,6 +18,11 @@ class SecondLoginEvent extends AccountEvent{
 
   SecondLoginEvent(this.usernameOrEmail, this.password, this.isEmail);
 }
+class RefreshEvent extends AccountEvent{
+  late final List<String> accessTokens;
+
+  RefreshEvent(this.accessTokens);
+}
 class AddChildEvent extends AccountEvent{
   late final String name;
   late final String userName;

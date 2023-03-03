@@ -3,6 +3,7 @@ import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:school_cafteria/core/navigation.dart';
+import 'package:school_cafteria/core/widgets/fade_animation.dart';
 import 'package:school_cafteria/features/account/presentation/pages/account/loginpage.dart';
 import 'package:school_cafteria/features/account/presentation/pages/homepage.dart';
 import 'package:sizer/sizer.dart';
@@ -24,7 +25,7 @@ class Splash  extends StatefulWidget {
 class SplashState extends State<Splash> with AfterLayoutMixin<Splash> {
   Future checkFirstSeen() async {
 
-      Timer(const Duration(seconds: 1), ()
+      Timer(const Duration(seconds: 3), ()
       {
         BlocProvider.of<AccountBloc>(context).add(CheckLoginEvent());
         // if(token) {
@@ -63,9 +64,9 @@ class SplashState extends State<Splash> with AfterLayoutMixin<Splash> {
         child :Scaffold(
         body: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children:[ Center(
+            children:[ FadeAnimation(2.5,Center(
               child:  Image(image: const AssetImage('assets/launcher/logo.png'),width:35.w ,height:40.h ,),
-            ),])
+            )),])
     ));
   }
 }
