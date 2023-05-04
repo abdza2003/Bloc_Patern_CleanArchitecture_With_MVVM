@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_multi_formatter/formatters/formatter_utils.dart';
+import 'package:school_cafteria/appBar.dart';
 import 'package:school_cafteria/app_localizations.dart';
 import 'package:school_cafteria/core/widgets/loading_widget.dart';
 import 'package:school_cafteria/features/products/presentation/bloc/products_bloc.dart';
@@ -53,30 +54,12 @@ class BannedProducts extends StatelessWidget {
                     fit: BoxFit.cover,
                     repeat: ImageRepeat.repeat,
                     image: AssetImage('assets/images/bg.png'))),
-            child: LoadingWidget()));
+            child: const LoadingWidget()));
       } else if (state is LoadedBannedState) {
         return Scaffold(
           extendBodyBehindAppBar: true,
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(10.h+10.w),
-            child: AppBar(
-                flexibleSpace:  Padding(
-                  padding:  EdgeInsets.only(top:5.h ,right: 38.w),
-                  child: Container(
-                    height: 8.h+7.w,
-                    decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/launcher/logo.png'))),),
-                ),
-                elevation: 20,
-                bottomOpacity: 0,
-                backgroundColor: Colors.white.withOpacity(0.7),
-                shadowColor: Color(0xffFF5DB9),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                      bottomRight: Radius.elliptical(1100, 500),
-                      bottomLeft: Radius.elliptical(550, 350)
-                  ),
-                )),
-          ),
+          appBar: getAppBar(),
+          //float button Location Adjust in terms of language
           floatingActionButtonLocation:
               AppLocalizations.of(context)!.locale!.languageCode != 'ar'
                   ? FloatingActionButtonLocation.endFloat
@@ -128,7 +111,7 @@ class BannedProducts extends StatelessWidget {
                     ),
                      ListView.builder(
                           shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: state.products.length,
                           itemBuilder: (context, index) {
                             return SizedBox(
@@ -259,7 +242,7 @@ class BannedProducts extends StatelessWidget {
 
 
                                                 },
-                                                child: Text("PRODUCTS_LIST_UNBLOCK".tr(context),style: TextStyle(color: Colors.red),),
+                                                child: Text("PRODUCTS_LIST_UNBLOCK".tr(context),style: const TextStyle(color: Colors.red),),
                                               )),
                                     ],
                                   ),

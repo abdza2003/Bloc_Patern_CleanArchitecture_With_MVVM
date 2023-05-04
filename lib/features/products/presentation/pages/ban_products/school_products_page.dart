@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
+import 'package:school_cafteria/appBar.dart';
 import 'package:school_cafteria/app_localizations.dart';
 import 'package:school_cafteria/features/products/data/models/selected_products_model.dart';
 import 'package:sizer/sizer.dart';
@@ -46,31 +47,12 @@ class MyPageState extends State<AddBannedProducts> {
                     fit: BoxFit.cover,
                     repeat: ImageRepeat.repeat,
                     image: AssetImage('assets/images/bg.png'))),
-            child: LoadingWidget()));
+            child: const LoadingWidget()));
       } else if (state is LoadedProductsSchoolState) {
         return Scaffold(
           extendBody: true,
           extendBodyBehindAppBar: true,
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(10.h+10.w),
-            child: AppBar(
-                flexibleSpace:  Padding(
-                  padding:  EdgeInsets.only(top:5.h ,right: 38.w),
-                  child: Container(
-                    height: 8.h+7.w,
-                    decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/launcher/logo.png'))),),
-                ),
-                elevation: 20,
-                bottomOpacity: 0,
-                backgroundColor: Colors.white.withOpacity(0.7),
-                shadowColor: Color(0xffFF5DB9),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                      bottomRight: Radius.elliptical(1100, 500),
-                      bottomLeft: Radius.elliptical(550, 350)
-                  ),
-                )),
-          ),
+          appBar: getAppBar(),
           bottomNavigationBar: Padding(
             padding: EdgeInsets.only(left: 35.w, right: 35.w),
             child: ElevatedButton(
@@ -80,6 +62,7 @@ class MyPageState extends State<AddBannedProducts> {
               borderRadius: BorderRadius.circular(20)),
             ),
               onPressed: () {
+                //ordering the products in terms of market or meal
                 SelectedProductsModel selectedProductsModel=SelectedProductsModel();
                 selectedProductsModel.mealsId=[];
                 selectedProductsModel.productsId=[];
@@ -134,7 +117,7 @@ class MyPageState extends State<AddBannedProducts> {
           ),
           ListView.builder(
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: state.products.length,
                       // itemComparator: (item1, item2) => item1.isMarket==item2.isMarket, // optional
                       // optional
@@ -252,13 +235,6 @@ class MyPageState extends State<AddBannedProducts> {
                             ),
 
                         );
-                        // return ListTile(
-                        //   minLeadingWidth: 25.w,
-                        //   title:Text(state.schoolProducts.restaurant![index].name!,style: TextStyle(fontSize: 12.sp,fontWeight: FontWeight.bold),) ,
-                        //   leading:state.schoolProducts.restaurant![index].image==null?Image.asset('assets/launcher/logo.png',scale: 15.0,):Image(image: NetworkImage(Network().baseUrl+state.schoolProducts.restaurant![index].image!),fit: BoxFit.fill,) ,
-                        //   trailing:const Icon(Icons.delete_rounded) ,
-                        //   subtitle:Text(state.schoolProducts.restaurant![index].price!) ,
-                        // );
                       }),
           ]),
               ),

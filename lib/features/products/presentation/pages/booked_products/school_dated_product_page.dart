@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:intl/intl.dart';
+import 'package:school_cafteria/appBar.dart';
 import 'package:school_cafteria/app_localizations.dart';
 import 'package:school_cafteria/features/products/data/models/products_model.dart';
 import 'package:school_cafteria/features/products/domain/entities/selected_products_quantity.dart';
@@ -50,11 +51,6 @@ class MyPageState extends State<SchoolDatedProduct> {
         SnackBarMessage()
             .showErrorSnackBar(message: state.message, context: context);
       } else if (state is SuccessMsgStateStoredBookedProducts) {
-        // Fluttertoast.showToast(
-        //     msg: state.message,
-        //     toastLength: Toast.LENGTH_LONG,
-        //     backgroundColor: Colors.green,
-        //     textColor: Colors.white);
          SnackBarMessage()
              .showSuccessSnackBar(message: state.message, context: context);
           BlocProvider.of<ProductsBloc>(context).add(GetBookedProductsEvent(
@@ -74,49 +70,13 @@ class MyPageState extends State<SchoolDatedProduct> {
         if (state.products.isEmpty) {
           return  Scaffold(
             extendBodyBehindAppBar: true,
-              appBar: PreferredSize(
-                preferredSize: Size.fromHeight(10.h+10.w),
-                child: AppBar(
-                    flexibleSpace:  Padding(
-                      padding:  EdgeInsets.only(top:5.h ,right: 38.w),
-                      child: Container(
-                        height: 8.h+7.w,
-                        decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/launcher/logo.png'))),),
-                    ),
-                    elevation: 20,
-                    bottomOpacity: 0,
-                    backgroundColor: Colors.white.withOpacity(0.7),
-                    shadowColor: Color(0xffFF5DB9),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                          bottomRight: Radius.elliptical(1100, 500),
-                          bottomLeft: Radius.elliptical(550, 350)),
-                    )),
-              ),
-              body: NoPageFound());
+              appBar:getAppBar(),
+              body: const NoPageFound());
         } else {
           return Scaffold(
               extendBody: true,
               extendBodyBehindAppBar: true,
-              appBar: PreferredSize(
-                preferredSize: Size.fromHeight(10.h+10.w),
-                child: AppBar(
-                    flexibleSpace:  Padding(
-                      padding:  EdgeInsets.only(top:5.h ,right: 38.w),
-                      child: Container(
-                        height: 8.h+7.w,
-                        decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/launcher/logo.png'))),),
-                    ),
-                    elevation: 20,
-                    bottomOpacity: 0,
-                    backgroundColor: Colors.white.withOpacity(0.7),
-                    shadowColor: Color(0xffFF5DB9),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                          bottomRight: Radius.elliptical(1100, 500),
-                          bottomLeft: Radius.elliptical(550, 350)),
-                    )),
-              ),
+              appBar: getAppBar(),
               bottomNavigationBar: Padding(
                 padding: EdgeInsets.only(left: 35.w, right: 35.w),
                 child: ElevatedButton(
@@ -126,7 +86,8 @@ class MyPageState extends State<SchoolDatedProduct> {
                               borderRadius: BorderRadius.circular(30.0)),
                           backgroundColor: Colors.white),
                   onPressed: () {
-                        SelectedProductsQuantityModel selectedProductsModel =
+                    //ordering the products in terms of market or meal
+                    SelectedProductsQuantityModel selectedProductsModel =
                             SelectedProductsQuantityModel();
                         selectedProductsModel.mealsIds = [];
                         selectedProductsModel.productsIds = [];
@@ -187,7 +148,7 @@ class MyPageState extends State<SchoolDatedProduct> {
                           ),
                           ListView.builder(
                                 shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
+                                physics: const NeverScrollableScrollPhysics(),
                                 itemCount: state.products.length,
                                 itemBuilder: (context, index) {
                                   return SizedBox(
