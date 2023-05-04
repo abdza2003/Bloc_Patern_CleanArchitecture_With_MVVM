@@ -1,27 +1,26 @@
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:grouped_list/grouped_list.dart';
 import 'package:school_cafteria/app_localizations.dart';
 import 'package:school_cafteria/core/app_theme.dart';
-import 'package:school_cafteria/features/account/data/models/child_model.dart';
 import 'package:school_cafteria/features/account/presentation/pages/Account/loginpage.dart';
-import 'package:school_cafteria/features/account/presentation/pages/add_child_page.dart';
 import 'package:school_cafteria/features/products/presentation/bloc/products_bloc.dart'
     as pb;
 import 'package:school_cafteria/features/balance/presentation/bloc/balance_bloc.dart'
     as bb;
 import 'package:school_cafteria/features/products/presentation/pages/day_products/school_days.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:school_cafteria/features/products/presentation/pages/history/invoices.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../core/navigation.dart';
 import '../../../../core/network/api.dart';
 import '../../../../core/util/snackbar_message.dart';
-import '../../../../main.dart';
+import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../products/presentation/pages/ban_products/banned_products_page.dart';
+import '../../../products/presentation/pages/day_products/products_search_by_price.dart';
+import '../../../products/presentation/pages/day_products/school_days_xd.dart';
 import '../../domain/entities/user.dart';
 import '../bloc/account/account_bloc.dart';
 
@@ -45,7 +44,11 @@ class MyPageState extends State<HomePage> {
           BlocListener<bb.BalanceBloc, bb.BalanceState>(
             listener: (context, state) {
               if (state is bb.SuccessMsgState) {
-                Fluttertoast.showToast(msg: state.message,toastLength: Toast.LENGTH_LONG,backgroundColor: Colors.green,textColor: Colors.white);
+                Fluttertoast.showToast(
+                    msg: state.message,
+                    toastLength: Toast.LENGTH_LONG,
+                    backgroundColor: Colors.green,
+                    textColor: Colors.white);
                 List<String> accessTokens = [];
                 for (var school in widget.user.schools!) {
                   accessTokens.add(school.accessToken!);
@@ -79,509 +82,420 @@ class MyPageState extends State<HomePage> {
             },
           )
         ],
-        child: Scaffold(
-            floatingActionButtonLocation:
-                AppLocalizations.of(context)!.locale!.languageCode != 'ar'
-                    ? FloatingActionButtonLocation.endFloat
-                    : FloatingActionButtonLocation.startFloat,
-            floatingActionButton: _getFAB(true, context),
-            appBar: AppBar(
-              leadingWidth: 30.w,
-              leading:
-              Row(
-                children: [
-                  // IconButton(
-                  //   icon: const Icon(Icons.logout),
-                  //   onPressed: () {
-                  //     BlocProvider.of<AccountBloc>(context).add(LogoutEvent());
-                  //     Go.offALL(context, const LoginPage(isAnother: false));
-                  //   },),
-                  SizedBox(width: 3.w,),
-                   SizedBox(
-                     width: 27.w,
-                     height: 10.h,
-                     child: DropdownButtonHideUnderline(
-                       child: DropdownButton(
-                           dropdownColor:Colors.white,
-                           hint:Text("Language",style: TextStyle(color: Colors.white),) ,
-                           items: [DropdownMenuItem(
-                          value: "en",
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                  width: 20.w,
-                                  child: Text(
-                                    textAlign: TextAlign.center,
-                                    "English",
-                                    style: TextStyle(fontSize: 14.sp),
-                                  )),
-                            ],
-                          ),
-                  ),DropdownMenuItem(
-                          value: "ar",
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                  width: 20.w,
-                                  child: Text(
-                                    "Arabic",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(fontSize: 14.sp),
-                                  )),
-                            ],
-                          ),
-                  ),
-                             DropdownMenuItem(
-                          value: "tr",
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                  width: 20.w,
-                                  child: Text(
-                                    "Turkey",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(fontSize: 14.sp),
-                                  )),
-                            ],
-                          ),
-                  ),
-                  ], onChanged: (String? lang) async {
-                             SharedPreferences local= await SharedPreferences.getInstance();
-                             local.setString("lang", lang!);
-                             if(mounted) {
-                               MyApp.of(context)?.setLocale(Locale.fromSubtags(languageCode: lang));
-                             }
-                       }),
-                     ),
-                   ),
-                  // ), IconButton(
-                  //   icon: const Icon(Icons.logout),
-                  // //  onPressed: () => MyApp.of(context)?.setLocale(Locale.fromSubtags(languageCode: 'ar')),
-                  //
-                  // ),
-                ],
-              ),
-              actions: [
-                ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.history),
-                  label: Text("HOME_PAGE_BUTTON5".tr(context)),
-                ),
-              ],
-              title: Text(
-                "APP_NAME".tr(context),
-                style: TextStyle(fontSize: 14.sp),
-              ),
-            ),
-            body: RefreshIndicator(
-              onRefresh: () {
-                List<String> accessTokens = [];
-                for (var school in widget.user.schools!) {
-                  accessTokens.add(school.accessToken!);
-                }
-                BlocProvider.of<AccountBloc>(context)
-                    .add(RefreshEvent(accessTokens));
+        child: RefreshIndicator(
+          onRefresh: () {
+            List<String> accessTokens = [];
+            for (var school in widget.user.schools!) {
+              accessTokens.add(school.accessToken!);
+            }
+            BlocProvider.of<AccountBloc>(context)
+                .add(RefreshEvent(accessTokens));
 
-                return Future.value();
-              },
-              child: GroupedListView<ChildModel, String>(
-                  elements: widget.user.childern!,
-                  // itemCount: user.childern?.length,
-                  groupBy: (child) => child.school!.name!,
-                  useStickyGroupSeparators: true,
-                  // optional
-                  groupSeparatorBuilder: (String groupByValue) => Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-
-                            Icon(
-                              Icons.school,
-                              color: primaryColor,
-                            ),
-                            SizedBox(
-                              width: 5.w,
-                            ),
-                            Text(
-                              groupByValue,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 15.sp, fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                      ),
-                  itemBuilder: (context, ChildModel childModel) {
-                    final name = TextEditingController();
-                    name.text = childModel.name!;
-                    final balance = TextEditingController();
-                    balance.text = toCurrencyString(
-                        childModel.balance.toString(),
-                        trailingSymbol: childModel.school!.currencyName!,
-                        useSymbolPadding: true);
-                    return SizedBox(
-                        height: 30.h,
-                        child: Container(
-                            decoration: BoxDecoration(boxShadow: [
-                              BoxShadow(
-                                color: pc2.withOpacity(0.1),
-                                blurRadius: 20.0,
-                              )
-                            ]),
-                            child: ClipRect(
-                                child: Banner(
-                              message: childModel.isActive == "1"
-                                  ? "CHILD_ACTIVE".tr(context)
-                                  : "CHILD_NOT_ACTIVE".tr(context),
-                              location: BannerLocation.topStart,
-                              color: childModel.isActive == "1"
-                                  ? Colors.green
-                                  : Colors.redAccent,
-                              child: Card(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25.0)),
-                                elevation: 10,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      color: pc2.withOpacity(0.2),
-                                      width: 37.w,
-                                      height: 100.h,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          childModel.image == null
-                                              ? Image.asset(
-                                                  'assets/launcher/logo.png',
-                                                  scale: 25.0,
-                                                )
-                                              : ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                  child: Image(
-                                                    image: NetworkImage(
-                                                        Network().baseUrl +
-                                                            childModel.image!),
-                                                    width: 30.w,
-                                                  )),
-                                        ],
-                                      ),
+            return Future.value();
+          },
+          child: ListView.builder(
+              itemCount: widget.user.childern!.length,
+              // itemCount: user.childern?.length,
+              // useStickyGroupSeparators: true,
+              // optional
+              itemBuilder: (context, index) {
+                final name = TextEditingController();
+                final schoolName = TextEditingController();
+                schoolName.text = widget.user.childern![index].school!.name!;
+                name.text = widget.user.childern![index].name!;
+                final balance = TextEditingController();
+                balance.text = toCurrencyString(
+                    widget.user.childern![index].balance.toString(),
+                    trailingSymbol:
+                        widget.user.childern![index].school!.currencyName!,
+                    useSymbolPadding: true);
+                return SizedBox(
+                    height: 20.h + 26.w,
+                    child: Container(
+                        decoration: BoxDecoration(boxShadow: [
+                          BoxShadow(
+                            color: pc2.withOpacity(0.1),
+                            blurRadius: 20.0,
+                          )
+                        ]),
+                        child: ClipRect(
+                            child: Banner(
+                          message: widget.user.childern![index].isActive == "1"
+                              ? "CHILD_ACTIVE".tr(context)
+                              : "CHILD_NOT_ACTIVE".tr(context),
+                          location: BannerLocation.topStart,
+                          color: widget.user.childern![index].isActive == "1"
+                              ? Colors.green
+                              : Colors.redAccent,
+                          child: Card(
+                            color: Colors.transparent,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                    width: 5, color: oldPrimaryColor),
+                                borderRadius: BorderRadius.circular(30.0)),
+                            child: Card(
+                              color: Colors.white.withOpacity(0.5),
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      width: 3, color: secondaryColor2),
+                                  borderRadius: BorderRadius.circular(25.0)),
+                              elevation: 0,
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    height: 5.h,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Text(name.text,
+                                            style: TextStyle(
+                                                color: textColor,
+                                                fontSize: 13.sp,
+                                                fontWeight: FontWeight.w700)),
+                                        Text(
+                                          toCurrencyString(balance.text,
+                                              useSymbolPadding: true,
+                                              trailingSymbol: widget
+                                                  .user
+                                                  .childern![index]
+                                                  .school!
+                                                  .currencyName!),
+                                          style: TextStyle(
+                                              color: textColor,
+                                              fontSize: 13.sp,
+                                              fontWeight: FontWeight.w700),
+                                        )
+                                      ],
                                     ),
-                                    Column(
+                                  ),
+
+                                  // TextField(
+                                  //   decoration: InputDecoration(
+                                  //     border: InputBorder.none,
+                                  //     prefixIcon: Icon(
+                                  //       Icons
+                                  //           .account_balance_wallet,
+                                  //       color: primaryColor,
+                                  //     ),
+                                  //   ),
+                                  //   readOnly: true,
+                                  //   controller: balance,
+                                  // ),
+                                  DottedLine(dashColor: secondaryColor2),
+                                  SizedBox(
+                                    width: 100.w,
+                                    height: 24.h,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         SizedBox(
-                                          width: 60.w,
-                                          height: 12.h,
+                                          width: 37.w,
+                                          height: 21.h,
                                           child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
-                                              SizedBox(
-                                                  height: 7.h,
-                                                  width: 60.w,
-                                                  child: TextField(
-                                                    style: TextStyle(
-                                                        fontSize: 13.sp),
-                                                    decoration: InputDecoration(
-                                                      //contentPadding: EdgeInsets.symmetric(vertical: 6),
-                                                      border: InputBorder.none,
-                                                      prefixIcon: Icon(
-                                                        Icons.person,
-                                                        color: primaryColor,
-                                                      ),
-                                                    ),
-                                                    readOnly: true,
-                                                    controller: name,
-                                                  )),
-                                              SizedBox(
-                                                  height: 5.h,
-                                                  width: 60.w,
-                                                  child: TextField(
-                                                    decoration: InputDecoration(
-                                                      contentPadding:
-                                                          const EdgeInsets
-                                                                  .symmetric(
-                                                              vertical: 1),
-                                                      border: InputBorder.none,
-                                                      prefixIcon: Icon(
-                                                        Icons
-                                                            .account_balance_wallet,
-                                                        color: primaryColor,
-                                                      ),
-                                                    ),
-                                                    readOnly: true,
-                                                    controller: balance,
-                                                  ))
+                                              widget.user.childern![index]
+                                                          .image ==
+                                                      null
+                                                  ? Image.asset(
+                                                      'assets/launcher/logo.png',
+                                                      width: 30.w,
+                                                      fit: BoxFit.fitHeight,
+                                                    )
+                                                  :  Container(
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                          BorderRadius.circular(
+                                                              25.0),
+                                                          border: Border.all(color: primaryColor)),
+                                                      height: 12.h+13.w,
+                                                    child: ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                  25.0),
+                                                          child:Image(
+                                                            fit: BoxFit.cover,
+                                                                image: NetworkImage(
+                                                                    Network().baseUrl + widget.user.childern![index].image!),
+                                                                width: 35.w,
+                                                              )),
+                                                  ),
                                             ],
                                           ),
                                         ),
-                                        Row(
+                                        Column(
                                           children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(4.0),
-                                              child: ElevatedButton.icon(
-                                                style: ElevatedButton.styleFrom(
-                                                  fixedSize: Size(28.w, 7.h),
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              15.0)),
-                                                ),
-                                                onPressed: childModel
-                                                            .isActive ==
-                                                        "0"
-                                                    ? null
-                                                    : () {
-                                                        if (childModel.weeklyBalance != null && childModel.weeklyBalance!="0.00") {
-                                                          BlocProvider.of<
-                                                                      pb.ProductsBloc>(
-                                                                  context)
-                                                              .add(pb.GetSchoolDaysEvent(
-                                                                  childModel
-                                                                      .id!,
-                                                                  childModel
-                                                                      .accessTokenParent!));
-                                                          Go.to(
-                                                              context,
-                                                              SchoolDays(
-                                                                  accessToken:
-                                                                      childModel
-                                                                          .accessTokenParent!,
-                                                                  childId:
-                                                                      childModel
-                                                                          .id!,
-                                                                  currency: childModel
-                                                                      .school!
-                                                                      .currencyName!,childName: childModel.name!,));
-                                                        } else {
-                                                          enterWeeklyBalance(
-                                                              context,
-                                                              childModel.name!,
-                                                              childModel.id!,
-                                                              childModel
-                                                                  .accessTokenParent!,
-                                                              childModel.school!
-                                                                  .currencyName!);
-                                                        }
-                                                      },
-                                                icon: Icon(
-                                                  // <-- Icon
-                                                  Icons.calendar_month,
-                                                  size: 16.sp,
-                                                ),
-                                                label: Text(
-                                                  "HOME_PAGE_BUTTON1"
-                                                      .tr(context),
-                                                  style: TextStyle(
-                                                      fontSize: 8.5.sp),
-                                                ),
-                                              ), // <-- Text
+                                            SizedBox(
+                                              height: 3.h,
                                             ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(4.0),
-                                              child: ElevatedButton.icon(
-                                                style: ElevatedButton.styleFrom(
-                                                  fixedSize: Size(28.w, 7.h),
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              15.0)),
+                                            SizedBox(
+                                                width: 55.w,
+                                                height: 3.h,
+                                                child: TextField(
+                                                  style: TextStyle(
+                                                      color: textColor,
+                                                      fontSize: 13.sp,
+                                                      fontWeight:
+                                                          FontWeight.w700),
+                                                  decoration: InputDecoration(
+                                                    border: InputBorder.none,
+                                                  ),
+                                                  readOnly: true,
+                                                  controller: schoolName,
+                                                )),
+                                            Row(
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(3.0),
+                                                  child: ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      fixedSize:
+                                                          Size(27.w, 6.h),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          15.0)),
+                                                    ),
+                                                    onPressed:
+                                                        widget
+                                                                    .user
+                                                                    .childern![
+                                                                        index]
+                                                                    .isActive ==
+                                                                "0"
+                                                            ? null
+                                                            : () {
+                                                          selectStudentSpendingType(context,widget.user.childern![index].name!,widget.user.childern![index].id!,widget.user.childern![index].accessTokenParent!,widget.user.childern![index].school!.currencyName!);
+                                                                // if (widget.user.childern![index].weeklyBalance !=
+                                                                //         null &&
+                                                                //     widget
+                                                                //             .user
+                                                                //             .childern![index]
+                                                                //             .weeklyBalance !=
+                                                                //         "0.00") {
+                                                                //   BlocProvider.of<pb.ProductsBloc>(context).add(pb.GetSchoolDaysEvent(
+                                                                //       widget
+                                                                //           .user
+                                                                //           .childern![
+                                                                //               index]
+                                                                //           .id!,
+                                                                //       widget
+                                                                //           .user
+                                                                //           .childern![
+                                                                //               index]
+                                                                //           .accessTokenParent!));
+                                                                //   Go.to(
+                                                                //       context,
+                                                                //       SchoolDays(
+                                                                //         accessToken: widget
+                                                                //             .user
+                                                                //             .childern![index]
+                                                                //             .accessTokenParent!,
+                                                                //         childId: widget
+                                                                //             .user
+                                                                //             .childern![index]
+                                                                //             .id!,
+                                                                //         currency: widget
+                                                                //             .user
+                                                                //             .childern![index]
+                                                                //             .school!
+                                                                //             .currencyName!,
+                                                                //         childName: widget
+                                                                //             .user
+                                                                //             .childern![index]
+                                                                //             .name!,
+                                                                //       ));
+                                                                // } else {
+                                                              },
+                                                    child: Text(
+                                                      "HOME_PAGE_BUTTON1"
+                                                          .tr(context),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        fontSize: 8.5.sp,
+                                                      ),
+                                                    ),
+                                                  ), // <-- Text
                                                 ),
-                                                onPressed:
-                                                    childModel.isActive == "0"
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(3.0),
+                                                  child: ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      fixedSize:
+                                                          Size(27.w, 6.h),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          15.0)),
+                                                    ),
+                                                    onPressed:
+                                                        widget
+                                                                    .user
+                                                                    .childern![
+                                                                        index]
+                                                                    .isActive ==
+                                                                "0"
+                                                            ? null
+                                                            : () {
+                                                                BlocProvider.of<
+                                                                            pb.ProductsBloc>(
+                                                                        context)
+                                                                    .add(pb.GetAllBannedProductsEvent(
+                                                                        widget
+                                                                            .user
+                                                                            .childern![
+                                                                                index]
+                                                                            .id!,
+                                                                        widget
+                                                                            .user
+                                                                            .childern![index]
+                                                                            .accessTokenParent!));
+                                                                Go.to(
+                                                                    context,
+                                                                    BannedProducts(
+                                                                        accessToken: widget
+                                                                            .user
+                                                                            .childern![
+                                                                                index]
+                                                                            .accessTokenParent!,
+                                                                        childId: widget
+                                                                            .user
+                                                                            .childern![
+                                                                                index]
+                                                                            .id!,
+                                                                        currency: widget
+                                                                            .user
+                                                                            .childern![index]
+                                                                            .school!
+                                                                            .currencyName!));
+                                                              },
+                                                    child: Text(
+                                                      "HOME_PAGE_BUTTON2"
+                                                          .tr(context),
+                                                      style: TextStyle(
+                                                          fontSize: 8.5.sp),
+                                                    ), // <-- Text
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(3.0),
+                                                  child: ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      fixedSize:
+                                                          Size(27.w, 6.h),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          15.0)),
+                                                    ),
+                                                    onPressed: widget
+                                                                .user
+                                                                .childern![
+                                                                    index]
+                                                                .isActive ==
+                                                            "0"
                                                         ? null
                                                         : () {
-                                                            BlocProvider.of<
-                                                                        pb.ProductsBloc>(
-                                                                    context)
-                                                                .add(pb.GetAllBannedProductsEvent(
-                                                                    childModel
-                                                                        .id!,
-                                                                    childModel
-                                                                        .accessTokenParent!));
-                                                            Go.to(
-                                                                context,
-                                                                BannedProducts(
-                                                                    accessToken:
-                                                                        childModel
-                                                                            .accessTokenParent!,
-                                                                    childId:
-                                                                        childModel
-                                                                            .id!,
-                                                                    currency: childModel
-                                                                        .school!
-                                                                        .currencyName!));
-                                                          },
-                                                icon: Icon(
-                                                  // <-- Icon
-                                                  Icons.not_interested,
-                                                  size: 16.sp,
+                                                      BlocProvider.of<pb.ProductsBloc>(context).add(pb.GetInvoicesEvent(widget.user.childern![index].id!,widget.user.childern![index].accessTokenParent!,null,null));
+                                                      Go.to(context, InvoicesPage(childId: widget.user.childern![index].id!,childImage: widget.user.childern![index].image!, accessToken: widget.user.childern![index].accessTokenParent!,currencyName:widget.user.childern![index].school!.currencyName! ,));
+                                                    },
+
+                                                    child: Text(
+                                                      "HOME_PAGE_BUTTON3"
+                                                          .tr(context),
+                                                      style: TextStyle(
+                                                          fontSize: 8.5.sp),
+                                                    ), // <-- Text
+                                                  ),
                                                 ),
-                                                label: Text(
-                                                  "HOME_PAGE_BUTTON2"
-                                                      .tr(context),
-                                                  style: TextStyle(
-                                                      fontSize: 8.5.sp),
-                                                ), // <-- Text
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(4.0),
-                                              child: ElevatedButton.icon(
-                                                style: ElevatedButton.styleFrom(
-                                                  fixedSize: Size(28.w, 7.h),
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              15.0)),
-                                                ),
-                                                onPressed:
-                                                    childModel.isActive == "0"
-                                                        ? null
-                                                        : () {},
-                                                icon: Icon(
-                                                  // <-- Icon
-                                                  Icons.receipt,
-                                                  size: 16.sp,
-                                                ),
-                                                label: Text(
-                                                  "HOME_PAGE_BUTTON3"
-                                                      .tr(context),
-                                                  style: TextStyle(
-                                                      fontSize: 8.5.sp),
-                                                ), // <-- Text
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(4.0),
-                                              child: ElevatedButton.icon(
-                                                style: ElevatedButton.styleFrom(
-                                                  fixedSize: Size(28.w, 7.h),
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              15.0)),
-                                                ),
-                                                onPressed:
-                                                    childModel.isActive == "0"
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(3.0),
+                                                  child: ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      fixedSize:
+                                                          Size(27.w, 6.h),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          15.0)),
+                                                    ),
+                                                    onPressed: widget
+                                                                .user
+                                                                .childern![
+                                                                    index]
+                                                                .isActive ==
+                                                            "0"
                                                         ? null
                                                         : () {
                                                             selectPaymentMethod(
                                                                 context,
-                                                                childModel
+                                                                widget
+                                                                    .user
+                                                                    .childern![
+                                                                        index]
                                                                     .name!,
-                                                                childModel.id!,
-                                                                childModel
+                                                                widget
+                                                                    .user
+                                                                    .childern![
+                                                                        index]
+                                                                    .id!,
+                                                                widget
+                                                                    .user
+                                                                    .childern![
+                                                                        index]
                                                                     .accessTokenParent!);
                                                           },
-                                                icon: Icon(
-                                                  // <-- Icon
-                                                  Icons
-                                                      .monetization_on_outlined,
-                                                  size: 16.sp,
+
+                                                    child: Text(
+                                                      "HOME_PAGE_BUTTON4"
+                                                          .tr(context),
+                                                      style: TextStyle(
+                                                          fontSize: 8.5.sp),
+                                                    ), // <-- Text
+                                                  ),
                                                 ),
-                                                label: Text(
-                                                  "HOME_PAGE_BUTTON4"
-                                                      .tr(context),
-                                                  style: TextStyle(
-                                                      fontSize: 8.5.sp),
-                                                ), // <-- Text
-                                              ),
+                                              ],
                                             ),
                                           ],
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                                //
+                                  ),
+                                ],
                               ),
-                            ))));
-                  }),
-            )));
-  }
-
-  Widget _getFAB(bool canAdd, BuildContext context) {
-    return SpeedDial(
-      childMargin: EdgeInsets.zero,
-      animatedIcon: AnimatedIcons.add_event,
-      //animatedIconTheme: IconThemeData(size: 22),
-      //backgroundColor: Color(0xFF801E48),
-      visible: true,
-      curve: Curves.bounceIn,
-      children: [
-        // FAB 1
-        SpeedDialChild(
-            child: const Icon(Icons.home_work),
-            //backgroundColor: Color(0xFF801E48),
-            onTap: () {
-              Go.to(context, const LoginPage(isAnother: true));
-            },
-            label: "HOME_PAGE_FLOAT_BUTTON".tr(context),
-            labelStyle: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-                fontSize: 10.sp),
-            labelBackgroundColor: primaryColor),
-        // FAB 2
-        SpeedDialChild(
-            visible: canAdd,
-            child: const Icon(Icons.child_care),
-            //backgroundColor: Color(0xFF801E48),
-            onTap: () => showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                      title: Text(
-                        "CHOOSE_SCHOOL".tr(context),
-                        style: TextStyle(color: primaryColor),
-                      ),
-                      content: SizedBox(
-                          height: 30.h, // Change as per your requirement
-                          width: 30.w,
-                          child: ListView.separated(
-                              shrinkWrap: true,
-                              separatorBuilder: (context, index) =>
-                                  const Divider(thickness: 1),
-                              itemCount: widget.user.schools!.length,
-                              itemBuilder: (context, index) {
-                                return ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.white,
-                                        side: BorderSide(color: primaryColor)),
-                                    onPressed: () => Go.off(
-                                        context,
-                                        AddChild(
-                                            accessToken: widget.user
-                                                .schools![index].accessToken!)),
-                                    child: Text(
-                                        widget.user.schools![index].name!,
-                                        style: TextStyle(
-                                            fontSize: 17.sp,
-                                            color: primaryColor)));
-                              })));
-                }),
-            //Go.to(context, const AddChild());
-            label: "HOME_PAGE_FLOAT_BUTTON2".tr(context),
-            labelStyle: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-                fontSize: 10.sp),
-            labelBackgroundColor: primaryColor)
-      ],
-    );
+                              //
+                            ),
+                          ),
+                        ))));
+              }),
+        ));
   }
 
   void selectPaymentMethod(
@@ -590,36 +504,53 @@ class MyPageState extends State<HomePage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-              title: Text(
-                "Choose Payment Method",
-                style: TextStyle(color: primaryColor),
+              titlePadding: EdgeInsets.zero,
+              title: SizedBox(
+                height: 8.h,
+                child: Card(
+                  color: primaryColor,
+                  elevation: 5,
+                  child: Center(
+                    child: Text(
+                      "HOME_PAGE_PAYMENT_METHOD".tr(context),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
               ),
-              content: Row( mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                       ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                fixedSize: Size(26.w, 10.h),
-                                backgroundColor: Colors.white,
-                                side: BorderSide(color: primaryColor)),
-                            onPressed: () {
-                              Go.back(context);
-                              enterCashPayment(
-                                  context, childName, childId, accessToken);
-                            },
-                            child: Text("Cash",
-                                style: TextStyle(
-                                    fontSize: 17.sp, color: primaryColor))),
-                       ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  fixedSize: Size(26.w, 10.h),
-                                  backgroundColor: Colors.white,
-                                  side: BorderSide(color: primaryColor)),
-                              onPressed: null,
-                              child: Text("Online",
-                                  style: TextStyle(
-                                      fontSize: 17.sp, color: primaryColor))),
-                    ],
-                  ));
+              content: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          elevation: 5,
+                          fixedSize: Size(60.w, 8.h),
+                          backgroundColor: Colors.white,
+                          side: BorderSide(color: primaryColor)),
+                      onPressed: () {
+                        Go.back(context);
+                        enterCashPayment(
+                            context, childName, childId, accessToken);
+                      },
+                      child: Text("PAYMENT_METHOD_1".tr(context),
+                          style:
+                              TextStyle(fontSize: 17.sp, color: primaryColor))),
+                  SizedBox(
+                    height: 4.h,
+                  ),
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          elevation: 5,
+                          fixedSize: Size(60.w, 8.h),
+                          backgroundColor: Colors.white,
+                          side: BorderSide(color: primaryColor)),
+                      onPressed: null,
+                      child: Text("PAYMENT_METHOD_2".tr(context),
+                          style:
+                              TextStyle(fontSize: 17.sp, color: primaryColor))),
+                ],
+              ));
         });
   }
 
@@ -630,64 +561,120 @@ class MyPageState extends State<HomePage> {
         builder: (_) => StatefulBuilder(
                 builder: (BuildContext context, StateSetter setState) {
               return AlertDialog(
+                backgroundColor: Colors.white,
                 contentPadding: EdgeInsets.zero,
                 actionsAlignment: MainAxisAlignment.center,
                 actions: <Widget>[
                   ElevatedButton(
-                      child: Text("Confirm", style: TextStyle(fontSize: 14.sp)),
+                      style: ElevatedButton.styleFrom(
+                        shadowColor: Colors.grey,
+                        backgroundColor: Colors.white,
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0)),
+                      ),
+                      child: Text("HOME_PAGE_SET_PAYMENT".tr(context),
+                          style:
+                              TextStyle(fontSize: 14.sp, color: Colors.green)),
                       onPressed: () async {
                         if (widget.formKey.currentState!.validate()) {
-                          Go.back(context);
+                          confirmationDialog(context,
+                                  (){Go.back(context);
                           BlocProvider.of<bb.BalanceBloc>(context).add(
                               bb.AddBalanceEvent(
                                   double.parse(widget.balance.text),
                                   childId,
-                                  accessToken));
+                                  accessToken));},
+                              "ADD_CREDIT_CONFIRMATION".tr(context)+widget.balance.text);
+
                         }
                       }),
                   ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shadowColor: Colors.grey,
+                        backgroundColor: Colors.white,
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0)),
+                      ),
                       onPressed: () => Navigator.pop(context),
                       child: Text("DIALOG_BUTTON_CANCEL".tr(context),
-                          style: TextStyle(fontSize: 14.sp)))
+                          style: TextStyle(fontSize: 14.sp, color: Colors.red)))
                 ],
-                title: Text(
-                  "Add Balance to $childName",
-                  style: TextStyle(fontSize: 11.sp),
-                  textAlign: TextAlign.center,
-                ),
+                titlePadding: EdgeInsets.zero,
+                title: SizedBox(
+                    height: 8.h,
+                    child: Card(
+                        color: primaryColor,
+                        elevation: 10,
+                        child: Center(
+                            child: Text(
+                          "SET_PAYMENTS_TITLE".tr(context),
+                          style: TextStyle(
+                              fontSize: 11.sp,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600),
+                          textAlign: TextAlign.center,
+                        )))),
                 content: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
-                  child: Form(
-                    key: widget.formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          width: 40.w,
-                          child: TextFormField(
-                            textAlign: TextAlign.center,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                  RegExp(r'(^-?\d*\.?\d*)'))
-                            ],
-                            validator: (mobile) => mobile!.isEmpty
-                                ? "REQUIRED_FIELD".tr(context)
-                                : null,
-                            controller: widget.balance,
-                            decoration: InputDecoration(
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: primaryColor),
+                  child: Column(
+                    children: [
+                      Text(
+                        "SET_PAYMENT_BODY".tr(context)+childName,
+                        style: TextStyle(
+                            fontSize: 11.sp,
+                            color: textColor,
+                            fontWeight: FontWeight.w600),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(
+                        height: 2.h,
+                      ),
+                      Form(
+                        key: widget.formKey,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: 40.w,
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30.0)),
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                      bottom: 2.h, right: 2.h, left: 2.h),
+                                  child: TextFormField(
+                                    textAlign: TextAlign.center,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.allow(
+                                          RegExp(r'(^-?\d*\.?\d*)'))
+                                    ],
+                                    validator: (mobile) => mobile!.isEmpty
+                                        ? "REQUIRED_FIELD".tr(context)
+                                        : null,
+                                    controller: widget.balance,
+                                    decoration: InputDecoration(
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: primaryColor),
+                                      ),
+                                      border: UnderlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: primaryColor),
+                                      ),
+                                      hintStyle: TextStyle(color: textColor),
+                                      hintText: 'DIALOG_SEARCH_PRICE_TEXT_HINT'
+                                          .tr(context),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              border: UnderlineInputBorder(
-                                borderSide: BorderSide(color: primaryColor),
-                              ),
-                              hintText:
-                                  'DIALOG_SEARCH_PRICE_TEXT_HINT'.tr(context),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -705,32 +692,46 @@ class MyPageState extends State<HomePage> {
                 actionsAlignment: MainAxisAlignment.center,
                 actions: <Widget>[
                   ElevatedButton(
-                      child: Text("Confirm", style: TextStyle(fontSize: 14.sp)),
-                      onPressed: ()  async {
+                      child: Text("DIALOG_CONFIRMATION_BUTTON1".tr(context), style: TextStyle(fontSize: 14.sp)),
+                      onPressed: () async {
                         if (widget.formKey1.currentState!.validate()) {
                           BlocProvider.of<bb.BalanceBloc>(context).add(
                               bb.StoreWeeklyBalanceEvent(
                                   double.parse(widget.weeklyBalance.text),
                                   childId,
                                   accessToken));
-                          await Future.delayed(const Duration(milliseconds:1500 ));
+                          await Future.delayed(
+                              const Duration(milliseconds: 1500));
                           if (mounted) {
-                            BlocProvider.of<
-                                pb.ProductsBloc>(
-                                context)
-                                .add(pb.GetSchoolDaysEvent(
-                                childId,
-                                accessToken));
-
-
+                            BlocProvider.of<pb.ProductsBloc>(context).add(
+                                pb.GetSchoolProductsByPriceEvent(childId,
+                                    accessToken, null));
                             Go.off(
                                 context,
-                                SchoolDays(
-                                    accessToken: accessToken,
-                                    childId: childId,
-                                    currency: currency,childName: childName,));
+                                ProductSearch(
+                                  accessToken: accessToken,
+                                  childId: childId,
+                                  currency: currency,
+                                  maxPrice: null,
+                                  dayId: null,
+                                  dayName: null,
+                                  isWeekly: true,
+                                  daysCount: 5,
+                                  weeklyBalance:widget.weeklyBalance.text,
+                                  childName: childName,
+                                ));
+                            // BlocProvider.of<pb.ProductsBloc>(context).add(
+                            //     pb.GetSchoolDaysEvent(childId, accessToken));
+                            //
+                            // Go.off(
+                            //     context,
+                            //     SchoolDays(
+                            //       accessToken: accessToken,
+                            //       childId: childId,
+                            //       currency: currency,
+                            //       childName: childName,
+                            //     ));
                           }
-
                         }
                       }),
                   ElevatedButton(
@@ -739,7 +740,7 @@ class MyPageState extends State<HomePage> {
                           style: TextStyle(fontSize: 14.sp)))
                 ],
                 title: Text(
-                  "Set Weekly Balance to $childName",
+                  "SET_WEEKLY_BALANCE".tr(context)+childName,
                   style: TextStyle(fontSize: 11.sp),
                   textAlign: TextAlign.center,
                 ),
@@ -780,5 +781,86 @@ class MyPageState extends State<HomePage> {
                 ),
               );
             }));
+  }
+  void selectStudentSpendingType(
+      BuildContext context, String childName, int childId, String accessToken, String currency) {
+    showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              titlePadding: EdgeInsets.zero,
+              title: SizedBox(
+                height: 8.h,
+                child:  Card(
+                  color: Colors.white,
+                  elevation: 10,
+                  child: Center(
+                    child: Text(
+                      "SET_SPENDING_TYPE".tr(context),
+                    ),
+                  ),
+                ),
+              ),
+              content: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          elevation: 5,
+                          fixedSize: Size(60.w, 8.h),
+                          backgroundColor: sc2,
+                          side: BorderSide(color: textColor)),
+                      onPressed: () {
+                        Go.back(context);
+                          BlocProvider.of<pb.ProductsBloc>(context).add(pb.GetSchoolDaysEvent(
+                              childId,
+                              accessToken));
+                          Go.to(
+                              context,
+                              SchoolDays2(
+                                accessToken: accessToken,
+                                childId: childId,
+                                currency: currency,
+                                childName: childName,
+                              ));
+                      },
+                      child: Text("SPENDING_TYPE1".tr(context),
+                          style:
+                          TextStyle(fontSize: 17.sp, color: textColor))),
+                  SizedBox(
+                    height: 4.h,
+                  ),
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          elevation: 5,
+                          fixedSize: Size(60.w, 8.h),
+                          backgroundColor: sc2,
+                          side: BorderSide(color: textColor)),
+                      onPressed:(){
+                        BlocProvider.of<pb.ProductsBloc>(context).add(
+                            pb.GetSchoolProductsByPriceEvent(childId,
+                                accessToken, null));
+                        Go.off(
+                            context,
+                            ProductSearch(
+                              accessToken: accessToken,
+                              childId: childId,
+                              currency: currency,
+                              maxPrice: null,
+                              dayId: null,
+                              dayName: null,
+                              isWeekly: true,
+                              daysCount: 5,
+                              weeklyBalance:widget.weeklyBalance.text,
+                              childName: childName,
+                            ));
+                      },
+                        child: Text("SPENDING_TYPE2".tr(context),
+                          style:
+                          TextStyle(fontSize: 17.sp, color: textColor))),
+                ],
+              ));
+        });
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:school_cafteria/app_localizations.dart';
-import 'package:school_cafteria/core/app_theme.dart';
 import 'package:sizer/sizer.dart';
 class NoPageFound extends StatelessWidget {
   const NoPageFound({Key? key}) : super(key: key);
@@ -8,7 +7,9 @@ class NoPageFound extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: pc2,
+      decoration: const BoxDecoration(
+          image: DecorationImage(image: AssetImage('assets/images/bg.png'),
+              fit: BoxFit.cover)),
       height: 100.h,
       width: 100.w,
       child: Column(

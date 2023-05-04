@@ -5,8 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
  class Network{
-  final String _url = 'http://kantin.yesapp.uk/api';
-  final String baseUrl = 'http://kantin.yesapp.uk';
+  final String _url = 'http://medrese.uk/api';
+  final String baseUrl = 'http://medrese.uk';
   dynamic token;
 
   _getToken(String? accessToken) async {

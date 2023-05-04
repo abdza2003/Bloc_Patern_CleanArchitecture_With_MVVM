@@ -1,12 +1,22 @@
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:school_cafteria/features/account/domain/usecases/account_change_password.dart';
+import 'package:school_cafteria/features/account/domain/usecases/account_delete_notification.dart';
+import 'package:school_cafteria/features/account/domain/usecases/account_edit_photo.dart';
+import 'package:school_cafteria/features/account/domain/usecases/account_get_notification.dart';
+import 'package:school_cafteria/features/account/domain/usecases/account_read_notification.dart';
+import 'package:school_cafteria/features/account/domain/usecases/account_register_token.dart';
 import 'package:school_cafteria/features/balance/data/datasources/balance_remote_datasource.dart';
 import 'package:school_cafteria/features/balance/data/repositories/balance_repository_impl.dart';
 import 'package:school_cafteria/features/balance/domain/repositories/balance_repository.dart';
 import 'package:school_cafteria/features/balance/domain/usecases/add_balance_usecase.dart';
+import 'package:school_cafteria/features/balance/domain/usecases/cancel_balance.dart';
+import 'package:school_cafteria/features/balance/domain/usecases/get_payments_usecase.dart';
 import 'package:school_cafteria/features/balance/domain/usecases/store_weekly_balance.dart';
 import 'package:school_cafteria/features/balance/presentation/bloc/balance_bloc.dart';
+import 'package:school_cafteria/features/products/domain/usecases/get_history_products.dart';
+import 'package:school_cafteria/features/products/domain/usecases/get_invoices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/network/network_info.dart';
 import 'features/account/data/datasources/account_local_datasource.dart';
@@ -27,10 +37,13 @@ import 'features/products/domain/usecases/delete_banned_products.dart';
 import 'features/products/domain/usecases/delete_day_product.dart';
 import 'features/products/domain/usecases/get_all_banned_products..dart';
 import 'features/products/domain/usecases/get_all_school_products..dart';
+import 'features/products/domain/usecases/get_booked_products.dart';
+import 'features/products/domain/usecases/get_dated_products.dart';
 import 'features/products/domain/usecases/get_day_products.dart';
 import 'features/products/domain/usecases/get_school_days.dart';
 import 'features/products/domain/usecases/get_school_product_by_price.dart';
 import 'features/products/domain/usecases/store_banned_products.dart';
+import 'features/products/domain/usecases/store_day_booked_products.dart';
 import 'features/products/domain/usecases/store_day_products.dart';
 import 'features/products/domain/usecases/store_week_products.dart';
 import 'features/products/presentation/bloc/products_bloc.dart';
@@ -48,7 +61,7 @@ Future<void> init() async {
       checkLoginUsecase: sl(),
       loginAgainUsecase: sl(),
       accountAddChildUsecase: sl(),
-      accountRefreshUsecase: sl()));
+      accountRefreshUsecase: sl(), accountRegisterTokenUsecase: sl(),accountChangePasswordUsecase: sl(),accountEditPhotoUsecase:sl() ,accountGetNotificationUsecase:sl() ,accountReadNotificationUsecase:sl(), accountDeleteNotificationUsecase: sl() ));
 
   sl.registerFactory(() => ProductsBloc(
       storeBannedProductsUsecase: sl(),
@@ -59,9 +72,17 @@ Future<void> init() async {
       getSchoolDaysUsecase: sl(),
       getDayProductsUsecase: sl(),
       deleteDayProductUsecase: sl(),
-      storeDayProductsUsecase: sl(), storeWeekProductsUsecase: sl()));
+      storeDayProductsUsecase: sl(),
+      storeWeekProductsUsecase: sl(),
+      getInvoicesUsecase: sl(),
+      getHistoryProductsUsecase: sl(),
+    getBookedProductsUsecase: sl(),
+    getDatedProductsUsecase: sl(),
+    storeDayBookedProductsUsecase: sl(),
 
-  sl.registerFactory(() => BalanceBloc(addBalanceUsecase: sl(), storeWeeklyBalanceUsecase: sl()));
+  ));
+
+  sl.registerFactory(() => BalanceBloc(addBalanceUsecase: sl(), storeWeeklyBalanceUsecase: sl(),getPaymentsUsecase: sl(),cancelBalanceUsecase: sl()));
 // Usecases
 
   sl.registerLazySingleton(() => AccountAddChildUsecase(sl()));
@@ -70,6 +91,13 @@ Future<void> init() async {
   sl.registerLazySingleton(() => AccountLogoutUsecase(sl()));
   sl.registerLazySingleton(() => AccountLoginAgainUsecase(sl()));
   sl.registerLazySingleton(() => AccountRefreshUsecase(sl()));
+  sl.registerLazySingleton(() => AccountRegisterTokenUsecase(sl()));
+  sl.registerLazySingleton(() => AccountChangePasswordUsecase(sl()));
+  sl.registerLazySingleton(() => AccountGetNotificationUsecase(sl()));
+  sl.registerLazySingleton(() => AccountReadNotificationUsecase(sl()));
+  sl.registerLazySingleton(() => AccountDeleteNotificationUsecase(sl()));
+  sl.registerLazySingleton(() => AccountEditPhotoUsecase(sl()));
+
 //Usecases2
   sl.registerLazySingleton(() => StoreBannedProductsUsecase(sl()));
   sl.registerLazySingleton(() => DeleteBannedProductsUsecase(sl()));
@@ -83,9 +111,17 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetSchoolDaysUsecase(sl()));
   sl.registerLazySingleton(() => GetSchoolProductsByPriceUsecase(sl()));
 
+  sl.registerLazySingleton(() => GetInvoicesUsecase(sl()));
+  sl.registerLazySingleton(() => GetHistoryProductsUsecase(sl()));
+
+  sl.registerLazySingleton(() => GetDatedProductsUsecase(sl()));
+  sl.registerLazySingleton(() => GetBookedProductsUsecase(sl()));
+  sl.registerLazySingleton(() => StoreDayBookedProductsUsecase(sl()));
   //Usecases3
   sl.registerLazySingleton(() => AddBalanceUsecase(sl()));
   sl.registerLazySingleton(() => StoreWeeklyBalanceUsecase(sl()));
+  sl.registerLazySingleton(() => GetPaymentsUsecase(sl()));
+  sl.registerLazySingleton(() => CancelBalanceUsecase(sl()));
 
 // Repository
 

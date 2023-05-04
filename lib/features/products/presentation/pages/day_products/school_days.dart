@@ -192,7 +192,7 @@ class SchoolDays extends StatelessWidget {
                         return Padding(
                           padding: EdgeInsets.only(top: 2.h),
                           child: SizedBox(
-                              height: 17.h,
+                              height: 18.h,
                               child: InkWell(
                                 onTap: () {
                                   BlocProvider.of<ProductsBloc>(context).add(
@@ -224,7 +224,7 @@ class SchoolDays extends StatelessWidget {
                                         children: [
                                           Container(
                                             height: 5.h,
-                                            width: 98.w,
+                                            width: 97.w,
                                             color: pc2,
                                             child: Text(
                                               state.weekDays.days![index].dayName!,

@@ -1,3 +1,5 @@
+import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -8,13 +10,18 @@ import 'package:school_cafteria/features/products/presentation/bloc/products_blo
 import 'package:school_cafteria/splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
+import 'firebase_options.dart';
 import 'injection_container.dart' as di;
 import 'app_localizations.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await di.init();
-  runApp(MyApp());
+  runApp( MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -58,7 +65,15 @@ class _MyAppState extends State<MyApp> {
               create: (_) => di.sl<BalanceBloc>()),
           ],
           child:MaterialApp(
-        title: 'School Cafeteria',
+              useInheritedMediaQuery: true,
+              //locale: DevicePreview.locale(context),
+              builder: (context, child) {
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                  child: child!,
+                );
+              },
+              title: 'School Cafeteria',
         theme: appTheme,
         supportedLocales: const [Locale('en'),Locale('tr'), Locale('ar')],
         localizationsDelegates: const [

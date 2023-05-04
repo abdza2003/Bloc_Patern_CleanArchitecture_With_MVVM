@@ -14,6 +14,8 @@ class ProductModel extends Product {
       super.updatedAt,
       super.showOnMobile,
       super.quantity,
+      super.isAvailableToBook,
+      super.restaurantDatedProduct
        //super.isMarket,
       // super.selected
 
@@ -31,7 +33,11 @@ class ProductModel extends Product {
       createdAt = json['created_at'];
       updatedAt = json['updated_at'];
       showOnMobile = json['show_on_mobile'];
-      quantity = json['quantity'];
+      quantity = json['available_quantity'];
+      isAvailableToBook = json['is_available_to_book'];
+      restaurantDatedProduct = json['restaurant_dated_product'] != null
+          ? RestaurantDatedProduct.fromJson(json['restaurant_dated_product'])
+          : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -47,7 +53,8 @@ class ProductModel extends Product {
       data['created_at'] = createdAt;
       data['updated_at'] = updatedAt;
       data['show_on_mobile'] = showOnMobile;
-      data['quantity'] = quantity;
+      data['available_quantity'] = quantity;
+      data['is_available_to_book'] = isAvailableToBook;
       return data;
   }
 }

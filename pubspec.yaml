@@ -37,6 +37,15 @@ dependencies:
   rename:
   simple_animations: ^3.0.0
   counter_button: ^1.0.1
+  firebase_messaging: ^14.2.5
+  firebase_core: ^2.7.0
+  flutter_local_notifications:
+  rxdart:
+  dotted_line:
+  device_preview:
+  intl: ^0.17.0
+  badges: ^3.0.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

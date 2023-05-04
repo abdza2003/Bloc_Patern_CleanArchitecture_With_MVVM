@@ -16,3 +16,15 @@ class StoreWeeklyBalanceEvent extends BalanceEvent{
 
   StoreWeeklyBalanceEvent(this.balance, this.childId, this.accessToken);
 }
+class GetPaymentsEvent extends BalanceEvent{
+  late final List<int> studentIds;
+  late final String? from;
+  late final String? to;
+  GetPaymentsEvent(this.studentIds,this.from,this.to);
+}
+class CancelBalanceEvent extends BalanceEvent{
+  late final int requestId;
+  late final String accessToken;
+
+  CancelBalanceEvent(this.requestId, this.accessToken);
+}

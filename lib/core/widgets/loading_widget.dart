@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
+import '../app_theme.dart';
+
 class LoadingWidget extends StatelessWidget {
   const LoadingWidget({Key? key}) : super(key: key);
 
@@ -11,8 +13,8 @@ class LoadingWidget extends StatelessWidget {
       width: 100.w,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          CircularProgressIndicator(),
+        children:  [
+          CircularProgressIndicator(color: oldPrimaryColor,),
         ],
       ),
     );

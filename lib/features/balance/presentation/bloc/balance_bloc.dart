@@ -3,7 +3,10 @@ import 'package:meta/meta.dart';
 import 'package:school_cafteria/features/balance/domain/usecases/store_weekly_balance.dart';
 import '../../../../app_localizations.dart';
 import '../../../../core/error/failures.dart';
+import '../../domain/entities/payments_view.dart';
 import '../../domain/usecases/add_balance_usecase.dart';
+import '../../domain/usecases/cancel_balance.dart';
+import '../../domain/usecases/get_payments_usecase.dart';
 
 part 'balance_event.dart';
 part 'balance_state.dart';
@@ -11,7 +14,9 @@ part 'balance_state.dart';
 class BalanceBloc extends Bloc<BalanceEvent, BalanceState> {
   AddBalanceUsecase addBalanceUsecase;
   StoreWeeklyBalanceUsecase storeWeeklyBalanceUsecase;
-  BalanceBloc({required this.addBalanceUsecase,required this.storeWeeklyBalanceUsecase}) : super(BalanceInitial()) {
+  GetPaymentsUsecase getPaymentsUsecase;
+  CancelBalanceUsecase cancelBalanceUsecase;
+  BalanceBloc({required this.addBalanceUsecase,required this.storeWeeklyBalanceUsecase,required this.getPaymentsUsecase,required this.cancelBalanceUsecase}) : super(BalanceInitial()) {
     on<BalanceEvent>((event, emit) async {
       if(event is AddBalanceEvent)
         {
@@ -23,7 +28,7 @@ class BalanceBloc extends Bloc<BalanceEvent, BalanceState> {
                   (_) {
 
                 emit(SuccessMsgState(
-                    message: "Order needs to be reviewed from the admin"));
+                    message: AppLocalizations.instance.translate("ORDER_SUBMITTED_SUCCESSFULLY")));
 
               });
         }
@@ -37,9 +42,33 @@ class BalanceBloc extends Bloc<BalanceEvent, BalanceState> {
                   (_) {
 
                 emit(SuccessMsgState(
-                    message: "Weekly Balanced has been set"));
+                    message: AppLocalizations.instance.translate("WEEKLY_BALANCE_SET_SUCCESSFULLY")));
 
               });
+        }
+      else if(event is CancelBalanceEvent)
+      {
+        emit(LoadingState());
+        final failureOrUnit = await cancelBalanceUsecase(event.requestId,event.accessToken);
+        failureOrUnit.fold(
+                (failure) =>
+                emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
+                (_) {
+
+              emit(SuccessCancelMsgState(
+                  message: AppLocalizations.instance.translate("REQUEST_DELETED_SUCCESSFULLY")));
+
+            });
+      }
+      else if(event is GetPaymentsEvent)
+        {
+          emit(LoadingState());
+          final failureOrProducts =
+          await getPaymentsUsecase(event.studentIds,event.from,event.to);
+          failureOrProducts.fold(
+                  (failure) =>
+                  emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
+                  (payments) => emit(LoadedPaymentsState(payments:payments )));
         }
 
     });

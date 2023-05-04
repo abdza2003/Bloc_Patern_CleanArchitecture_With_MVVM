@@ -13,6 +13,20 @@ class GetAllSchoolProductsEvent extends ProductsEvent{
 
   GetAllSchoolProductsEvent(this.childId, this.accessToken);
 }
+class GetInvoicesEvent extends ProductsEvent{
+  late final int childId;
+  late final String accessToken;
+  late final String? from;
+  late final String? to;
+
+  GetInvoicesEvent(this.childId, this.accessToken,this.from,this.to);
+}
+class GetHistoryProductsEvent extends ProductsEvent{
+  late final int invoiceId;
+  late final String accessToken;
+
+  GetHistoryProductsEvent(this.invoiceId, this.accessToken);
+}
 class GetAllBannedProductsEvent extends ProductsEvent{
   late final int childId;
   late final String accessToken;
@@ -61,14 +75,34 @@ class DeleteDayProductEvent extends ProductsEvent{
   DeleteDayProductEvent(this.productId, this.childId, this.accessToken,this.dayId);
 }
 class StoreDayProductsEvent extends ProductsEvent{
-  late final SelectedProductsModel selectedProducts;
+  late final SelectedProductsQuantityModel selectedProducts;
   late final String accessToken;
 
   StoreDayProductsEvent(this.selectedProducts, this.accessToken);
 }
 class StoreWeekProductsEvent extends ProductsEvent{
-  late final SelectedProductsModel selectedProducts;
+  late final SelectedProductsQuantityModel selectedProducts;
   late final String accessToken;
 
   StoreWeekProductsEvent(this.selectedProducts, this.accessToken);
+}
+
+class GetDatedProductsEvent extends ProductsEvent{
+  late final String accessToken;
+  late final int dayId;
+
+  GetDatedProductsEvent(this.accessToken,this.dayId);
+}
+class GetBookedProductsEvent extends ProductsEvent{
+  late final int childId;
+  late final int dayId;
+  late final String accessToken;
+
+  GetBookedProductsEvent(this.childId, this.accessToken,this.dayId);
+}
+class StoreDayBookedProductsEvent extends ProductsEvent{
+  late final SelectedProductsQuantityModel selectedProducts;
+  late final String accessToken;
+
+  StoreDayBookedProductsEvent(this.selectedProducts, this.accessToken);
 }

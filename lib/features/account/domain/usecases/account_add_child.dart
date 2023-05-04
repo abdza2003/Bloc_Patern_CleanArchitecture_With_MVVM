@@ -10,7 +10,7 @@ class AccountAddChildUsecase {
 
   AccountAddChildUsecase(this.repository);
 
-  Future<Either<Failure, Unit>> call(String name,String userName,String password,String email,String mobile,XFile? image,String accessToken) async {
-    return await repository.addChild(name,userName,password,email,mobile,image,accessToken);
+  Future<Either<Failure, Unit>> call(String name,String userName,String password,String email,String mobile,String classRoom, String division,String accessToken) async {
+    return await repository.addChild(name,userName,password,email,mobile,classRoom,division,accessToken);
   }
 }

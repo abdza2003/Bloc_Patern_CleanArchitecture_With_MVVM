@@ -6,13 +6,13 @@ import 'package:flutter_multi_formatter/formatters/formatter_utils.dart';
 import 'package:school_cafteria/app_localizations.dart';
 import 'package:school_cafteria/core/widgets/loading_widget.dart';
 import 'package:school_cafteria/features/products/presentation/bloc/products_bloc.dart';
-import 'package:school_cafteria/features/products/presentation/no_product_found.dart';
 import 'package:school_cafteria/features/products/presentation/pages/day_products/products_search_by_price.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../../core/app_theme.dart';
 import '../../../../../core/navigation.dart';
 import '../../../../../core/network/api.dart';
 import '../../../../../core/util/snackbar_message.dart';
+import '../../../../../core/widgets/confirmation_dialog.dart';
 
 class DayProducts extends StatelessWidget {
   DayProducts(
@@ -21,7 +21,8 @@ class DayProducts extends StatelessWidget {
       required this.childId,
       required this.currency,
       required this.dayId,
-      required this.dayName, required this.childName})
+      required this.dayName,
+      required this.childName})
       : super(key: key);
   final String accessToken;
   final String childName;
@@ -35,13 +36,50 @@ class DayProducts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(dayName + "DAY_PRODUCTS_TITLE".tr(context)),
+        extendBodyBehindAppBar: true,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(10.h+10.w),
+          child: AppBar(
+              flexibleSpace:  Padding(
+                padding:  EdgeInsets.only(top:5.h ,right: 38.w),
+                child: Container(
+                  height: 8.h+7.w,
+                  decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/launcher/logo.png'))),),
+              ),
+              elevation: 20,
+              bottomOpacity: 0,
+              backgroundColor: Colors.white.withOpacity(0.7),
+              shadowColor: Color(0xffFF5DB9),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    bottomRight: Radius.elliptical(1100, 500),
+                    bottomLeft: Radius.elliptical(550, 350)),
+              )),
         ),
-        floatingActionButtonLocation: AppLocalizations.of(context)!.locale!.languageCode!='ar'?FloatingActionButtonLocation.endFloat:FloatingActionButtonLocation.startFloat,
+        floatingActionButtonLocation:
+            AppLocalizations.of(context)!.locale!.languageCode != 'ar'
+                ? FloatingActionButtonLocation.endFloat
+                : FloatingActionButtonLocation.startFloat,
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            enterDetailsDialog(context);
+            BlocProvider.of<ProductsBloc>(context).add(
+                GetSchoolProductsByPriceEvent(childId,
+                    accessToken, null));
+            Go.off(
+                context,
+                ProductSearch(
+                  accessToken: accessToken,
+                  childId: childId,
+                  currency: currency,
+                  maxPrice: null,
+                  dayId: dayId,
+                  dayName: dayName,
+                  isWeekly: false,
+                  daysCount: null,
+                  weeklyBalance: null,
+                  childName: childName,
+                ));
+            //enterDetailsDialog(context);
           },
           child: const Icon(Icons.add),
         ),
@@ -69,129 +107,202 @@ class DayProducts extends StatelessWidget {
           state,
         ) {
           if (state is LoadingState) {
-            return const LoadingWidget();
+            return Scaffold(body: Container(
+                decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        fit: BoxFit.cover,
+                        repeat: ImageRepeat.repeat,
+                        image: AssetImage('assets/images/bg.png'))),
+                child: const  LoadingWidget()));
           } else if (state is LoadedDayProductsState) {
-            return state.products.isEmpty
-                ? Center(
-              child: Text("NO_PRODUCT_FOUND".tr(context)),
-            )
-                :
-                    ListView.builder(
-                        itemCount: state.products.length,
-                        itemBuilder: (context, index) {
-                          return SizedBox(
-                            height: 18.h,
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(0.0),
-                              ),
-                              color: Colors.white70,
-                              elevation: 10,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.all(0.4.h),
-                                    child: ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                          minWidth: 35.w,
-                                          maxWidth: 35.w,
-                                          maxHeight: 20.h,
-                                          minHeight: 20.h,
-                                        ),
-                                        child: state.products[index].image == null
-                                            ? Image.asset(
-                                                'assets/launcher/logo.png',
-                                                scale: 15.0,
-                                              )
-                                            : Image(
-                                                image: NetworkImage(Network()
-                                                        .baseUrl +
-                                                    state.products[index].image!),
-                                                fit: BoxFit.fill,
-                                              )),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+            return Container(
+                    decoration: const BoxDecoration(
+                        image: DecorationImage(
+                            fit: BoxFit.cover,
+                            repeat: ImageRepeat.repeat,
+                            image: AssetImage('assets/images/bg.png'))),
+                    child: ListView(children: [
+                      SizedBox(
+                        height: 2.h,
+                      ),
+                      Center(
+                        child: Card(
+                          color: Colors.white.withOpacity(0.7),
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0)),
+                          child: SizedBox(
+                            height: 5.h,
+                            width: 66.w,
+                            child: Center(
+                                child: Text("PRODUCTS_LIST".tr(context),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: textColor,
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.w700))),
+                          ),
+                        ),
+                      ),
+                       ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: state.products.length,
+                              itemBuilder: (context, index) {
+                                return SizedBox(
+                                  height: 7.h + 20.w,
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      SizedBox(
-                                        width:
-                                        MediaQuery.of(context).size.width * 0.41,
-                                        child: Padding(
-                                          padding:
-                                              EdgeInsets.fromLTRB(1.w, 1.h, 0, 0),
-                                          child: Row(
-                                            children: [
-                                              AutoSizeText(
-                                                state.products[index].name!,
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 13.sp,
-                                                ),
+                                      Padding(
+                                              padding: EdgeInsets.all(0.4.h),
+                                              child: ConstrainedBox(
+                                                  constraints: BoxConstraints(
+                                                    minWidth: 35.w,
+                                                    maxWidth: 35.w,
+                                                    maxHeight: 20.h,
+                                                    minHeight: 20.h,
+                                                  ),
+                                                  child: state.products[index]
+                                                              .image ==
+                                                          null
+                                                      ? Image.asset(
+                                                          'assets/launcher/logo.png',
+                                                          scale: 15.0,
+                                                        )
+                                                      : Container(
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.white70,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          25.0),
+                                                              border: Border.all(
+                                                                  color:
+                                                                      primaryColor)),
+                                                          height: 12.h + 13.w,
+                                                          child: ClipRRect(
+                                                              borderRadius: BorderRadius.circular(25.0),
+                                                              child: Image(
+                                                                fit: BoxFit.cover,
+                                                                image: NetworkImage(Network().baseUrl + state.products[index].image!),
+                                                                width: 35.w,
+                                                              )),
+                                                        )
+                                              )),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          SizedBox(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.37,
+                                            child: Padding(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  1.w, 1.h, 0, 0),
+                                              child: Row(
+                                                children: [
+                                                  AutoSizeText(
+                                                    state.products[index].name!,
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 13.sp,
+                                                    ),
+                                                  ),
+                                                  state.products[index]
+                                                                  .quantity ==
+                                                              0 ||
+                                                          state.products[index]
+                                                                  .quantity ==
+                                                              null
+                                                      ? SizedBox()
+                                                      : Text(
+                                                          "X ${state.products[index].quantity}")
+                                                ],
                                               ),
-                                          state.products[index].quantity==0?SizedBox():Text("X ${state.products[index].quantity}")
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width:
-                                        MediaQuery.of(context).size.width * 0.41,
-                                        height: 9.h,
-                                        child: Padding(
-                                          padding:
-                                              EdgeInsets.fromLTRB(1.w, 1.h, 0, 0),
-                                          child: AutoSizeText(
-                                            state.products[index].description ??
-                                                state.products[index].name!,
-                                            style: TextStyle(
-                                              fontSize: 11.sp,
                                             ),
                                           ),
-                                        ),
+                                          SizedBox(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.37,
+                                            height: 9.h,
+                                            child: Padding(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  1.w, 1.h, 0, 0),
+                                              child: AutoSizeText(
+                                                state.products[index]
+                                                        .description ??
+                                                    state.products[index].name!,
+                                                style: TextStyle(
+                                                  fontSize: 11.sp,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                  Column(
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(0, 1.h, 0, 0),
-                                        child: Text(
-                                          toCurrencyString(
-                                              state.products[index].price!,
-                                              trailingSymbol: currency,
-                                              useSymbolPadding: true),
-                                          style: TextStyle(
-                                              fontSize: 11.sp,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      Padding(
-                                          padding:
-                                              EdgeInsets.fromLTRB(2.w, 2.h, 0, 0),
-                                          child: InkWell(
-                                              onTap: () {
-                                                BlocProvider.of<ProductsBloc>(
-                                                        context)
-                                                    .add(DeleteDayProductEvent(
-                                                        state.products[index].id!,
-                                                        childId,
-                                                        accessToken,
-                                                        dayId));
-                                              },
-                                              child: Icon(
-                                                Icons.delete_rounded,
-                                                size: 25.sp,
-                                                color: Colors.red,
-                                              ))),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        });
+                                      Column(
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: EdgeInsets.fromLTRB(
+                                                0, 1.h, 0, 0),
+                                            child: Text(
+                                              toCurrencyString(
+                                                  state.products[index].price!,
+                                                  trailingSymbol: currency,
+                                                  useSymbolPadding: true),
+                                              style: TextStyle(
+                                                  fontSize: 11.sp,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          Padding(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  0.w, 2.h, 0, 0),
+                                              child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                    )),
+                                                onPressed: () {
+                                                  confirmationDialog(context,(){BlocProvider.of<ProductsBloc>(
+                                                      context)
+                                                      .add(
+                                                      DeleteDayProductEvent(
+                                                          state
+                                                              .products[
+                                                          index]
+                                                              .id!,
+                                                          childId,
+                                                          accessToken,
+                                                          dayId));},"PRODUCT_REMOVE_DAY_CONFIRMATION".tr(context));
 
+                                                },
+                                                child: Text(
+                                                  "PRODUCTS_LIST_DELETE".tr(context),
+                                                  style: TextStyle(
+                                                      color: Colors.red,
+                                                      fontSize: 15.sp),
+                                                ),
+                                              ))
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              })
+                    ]));
           } else {
             return const SizedBox();
           }
@@ -205,7 +316,7 @@ class DayProducts extends StatelessWidget {
                 builder: (BuildContext context, StateSetter setState) {
               return AlertDialog(
                 contentPadding: EdgeInsets.zero,
-                actionsAlignment:MainAxisAlignment.center,
+                actionsAlignment: MainAxisAlignment.center,
                 actions: <Widget>[
                   ElevatedButton(
                       child: Text("DIALOG_BUTTON_SEARCH".tr(context),
@@ -253,7 +364,8 @@ class DayProducts extends StatelessWidget {
                           child: TextFormField(
                             textAlign: TextAlign.center,
                             inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.allow(RegExp(r'(^-?\d*\.?\d*)'))
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'(^-?\d*\.?\d*)'))
                             ],
                             validator: (mobile) => mobile!.isEmpty
                                 ? "REQUIRED_FIELD".tr(context)

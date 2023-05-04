@@ -1,6 +1,7 @@
 import 'package:school_cafteria/features/products/data/models/selected_products_model.dart';
 import '../../../../core/network/api.dart';
 import '../../../../core/network/common_response.dart';
+import '../models/selected_products_quantity_model.dart';
 
 abstract class ProductsRemoteDataSource {
   Future<dynamic> getAllBannedProducts(int childId,String accessToken);
@@ -12,8 +13,15 @@ abstract class ProductsRemoteDataSource {
   Future<dynamic> getSchoolProductsByPrice(int childId,String accessToken,double? maxPrice);
   Future<dynamic> getDayProducts(int childId,String accessToken, int dayId);
   Future<dynamic> deleteDayProduct(int productId,int childId,String accessToken,int dayId);
-  Future<dynamic> storeDayProducts(SelectedProductsModel selectedProducts,String accessToken);
-  Future<dynamic> storeWeekProducts(SelectedProductsModel selectedProducts,String accessToken);
+  Future<dynamic> storeDayProducts(SelectedProductsQuantityModel selectedProducts,String accessToken);
+  Future<dynamic> storeWeekProducts(SelectedProductsQuantityModel selectedProducts,String accessToken);
+
+  Future<dynamic> getInvoices(int childId,String accessToken,String? from,String? to);
+  Future<dynamic> getHistoryProducts(int invoiceId,String accessToken);
+
+  Future<dynamic> getDatedProducts(String accessToken,int dayId);
+  Future<dynamic> getBookedProducts(int childId,String accessToken, int dayId);
+  Future<dynamic> storeDayBookedProducts(SelectedProductsQuantityModel selectedProducts,String accessToken);
 }
 class ProductsRemoteDataSourceImpl implements ProductsRemoteDataSource {
   @override
@@ -80,14 +88,54 @@ class ProductsRemoteDataSourceImpl implements ProductsRemoteDataSource {
   }
 
   @override
-  Future storeDayProducts(SelectedProductsModel selectedProducts, String accessToken) {
+  Future storeDayProducts(SelectedProductsQuantityModel selectedProducts, String accessToken) {
     return Network().postAuthData(selectedProducts.toJson(),"/student/store-day-products",accessToken).then((dynamic response) {
       return CommonResponse<dynamic>.fromJson(response);
-    });}
+    });
+  }
 
   @override
-  Future storeWeekProducts(SelectedProductsModel selectedProducts, String accessToken) {
+  Future storeWeekProducts(SelectedProductsQuantityModel selectedProducts, String accessToken) {
     return Network().postAuthData(selectedProducts.toJson(),"/student/store-weekly-products",accessToken).then((dynamic response) {
+      return CommonResponse<dynamic>.fromJson(response);
+    });
+  }
+
+  @override
+  Future getHistoryProducts(int invoiceId, String accessToken) {
+    return Network().getAuthData("/user/get-invoice-products/$invoiceId",accessToken).then((dynamic response) {
+      return CommonResponse<dynamic>.fromJson(response);
+    });
+  }
+
+  @override
+  Future getInvoices(int childId, String accessToken,String? from,String? to) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['student_id']=childId;
+    data['from']=from;
+    data['to']=to;
+    return Network().postAuthData(data,"/user/get-history",accessToken).then((dynamic response) {
+      return CommonResponse<dynamic>.fromJson(response);
+    });
+  }
+
+  @override
+  Future getBookedProducts(int childId, String accessToken, int dayId) {
+    return Network().getAuthData("/student/get-booked-products/$childId/$dayId",accessToken).then((dynamic response) {
+      return CommonResponse<dynamic>.fromJson(response);
+    });
+  }
+
+  @override
+  Future getDatedProducts(String accessToken,int dayId) {
+    return Network().getAuthData("/school/get-dated-product/$dayId",accessToken).then((dynamic response) {
+      return CommonResponse<dynamic>.fromJson(response);
+    });
+  }
+
+  @override
+  Future storeDayBookedProducts(SelectedProductsQuantityModel selectedProducts, String accessToken) {
+    return Network().postAuthData(selectedProducts.toJson(),"/student/store-dated-products",accessToken).then((dynamic response) {
       return CommonResponse<dynamic>.fromJson(response);
     });
   }

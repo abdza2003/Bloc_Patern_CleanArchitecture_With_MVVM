@@ -4,9 +4,10 @@ class SchoolDays  extends Equatable {
   int? dayId;
   String? dayName;
   int? productsCount;
+  int? mealsCount;
   dynamic productsPrice;
 
-  SchoolDays({this.dayId, this.dayName, this.productsCount, this.productsPrice});
+  SchoolDays({this.dayId, this.dayName, this.productsCount, this.productsPrice,this.mealsCount});
 
   @override
   // TODO: implement props
