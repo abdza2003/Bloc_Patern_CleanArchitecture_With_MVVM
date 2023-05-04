@@ -1,11 +1,10 @@
-
 import 'package:flutter/material.dart';
-import 'package:school_cafteria/core/navigation.dart';
 import 'package:sizer/sizer.dart';
 import 'package:badges/badges.dart' as badges;
 
 class FABBottomAppBarItem {
-  FABBottomAppBarItem({required this.iconData, required this.text,this.count});
+  FABBottomAppBarItem({required this.iconData, required this.text, this.count});
+
   IconData iconData;
   String text;
   int? count;
@@ -25,6 +24,7 @@ class FABBottomAppBar extends StatefulWidget {
   }) {
     assert(items.length == 2 || items.length == 4);
   }
+
   final List<FABBottomAppBarItem> items;
   final String? centerItemText;
   final double height;
@@ -95,7 +95,8 @@ class FABBottomAppBarState extends State<FABBottomAppBar> {
     required int index,
     required ValueChanged<int> onPressed,
   }) {
-    Color? color = _selectedIndex == index ? widget.selectedColor : widget.color;
+    Color? color =
+        _selectedIndex == index ? widget.selectedColor : widget.color;
     return Expanded(
       child: SizedBox(
         height: widget.height,
@@ -107,13 +108,17 @@ class FABBottomAppBarState extends State<FABBottomAppBar> {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-    (item.count==0||item.count==null)?Icon(item.iconData, color: color, size: widget.iconSize):badges.Badge(
-                  badgeContent: Text(item.count.toString()),
-                  child:Icon(item.iconData, color: color, size: widget.iconSize),
-                ),
+                //either regular icon or icon with badge of notification count
+                (item.count == 0 || item.count == null)
+                    ? Icon(item.iconData, color: color, size: widget.iconSize)
+                    : badges.Badge(
+                        badgeContent: Text(item.count.toString()),
+                        child: Icon(item.iconData,
+                            color: color, size: widget.iconSize),
+                      ),
                 Text(
                   item.text,
-                  style: TextStyle(color: color,fontSize: 10.sp),
+                  style: TextStyle(color: color, fontSize: 10.sp),
                 )
               ],
             ),

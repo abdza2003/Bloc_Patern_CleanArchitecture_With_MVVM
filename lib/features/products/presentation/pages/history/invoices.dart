@@ -121,14 +121,14 @@ class _InvoicesPageState extends State<InvoicesPage> {
                                       DateTime? pickedDate = await showDatePicker(
                                           context: context,
                                           initialDate: DateTime.now(), //get today's date
-                                          firstDate: DateTime(2000), //DateTime.now() - not to allow to choose before today.
+                                          firstDate: DateTime(2000), //DateTime.now()
                                           lastDate: DateTime(2101)
                                       );
 
                                       if(pickedDate != null ){
-                                        String formattedDate = date.DateFormat('dd-MM-yyyy').format(pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                                        String formattedDate = date.DateFormat('dd-MM-yyyy').format(pickedDate);
                                         setState(() {
-                                          fromDateController.text = formattedDate; //set foratted date to TextField value.
+                                          fromDateController.text = formattedDate; //
                                         });
                                       }else{
                                         if (kDebugMode) {
@@ -165,15 +165,15 @@ class _InvoicesPageState extends State<InvoicesPage> {
                                       DateTime? pickedDate = await showDatePicker(
                                           context: context,
                                           initialDate: DateTime.now(), //get today's date
-                                          firstDate: DateTime(2000), //DateTime.now() - not to allow to choose before today.
+                                          firstDate: DateTime(2000), //DateTime.now()
                                           lastDate: DateTime(2101)
                                       );
 
                                       if(pickedDate != null ){
-                                        String formattedDate = date.DateFormat('dd-MM-yyyy').format(pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                                        String formattedDate = date.DateFormat('dd-MM-yyyy').format(pickedDate);
 
                                         setState(() {
-                                          toDateController.text = formattedDate; //set foratted date to TextField value.
+                                          toDateController.text = formattedDate;
                                         });
                                       }else{
                                         if (kDebugMode) {

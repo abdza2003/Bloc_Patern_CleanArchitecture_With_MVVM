@@ -1,5 +1,3 @@
-import 'package:device_preview/device_preview.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -21,50 +19,48 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await di.init();
-  runApp( MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 
-  static _MyAppState? of(BuildContext context) => context.findAncestorStateOfType<_MyAppState>();
+  static _MyAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_MyAppState>();
 }
 
 class _MyAppState extends State<MyApp> {
-   Locale? _locale;
+  Locale? _locale;
 
-   @override
-  void initState()  {
-     getLocale();
+  @override
+  void initState() {
+    getLocale();
     super.initState();
   }
+
   void setLocale(Locale value) {
     setState(() {
       _locale = value;
     });
   }
-  void getLocale()
-  async {
-    SharedPreferences local =await SharedPreferences.getInstance();
-    setLocale(Locale(local.getString("lang")??"en"));
+
+  void getLocale() async {
+    SharedPreferences local = await SharedPreferences.getInstance();
+    setLocale(Locale(local.getString("lang") ?? "en"));
   }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return Sizer(
-        builder: (context, orientation, deviceType) {
-          return MultiBlocProvider(
-              providers: [
-              BlocProvider(
-              create: (_) => di.sl<AccountBloc>()),
-                BlocProvider(
-              create: (_) => di.sl<ProductsBloc>()),
-                BlocProvider(
-              create: (_) => di.sl<BalanceBloc>()),
+    return Sizer(builder: (context, orientation, deviceType) {
+      return MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (_) => di.sl<AccountBloc>()),
+            BlocProvider(create: (_) => di.sl<ProductsBloc>()),
+            BlocProvider(create: (_) => di.sl<BalanceBloc>()),
           ],
-          child:MaterialApp(
+          child: MaterialApp(
               useInheritedMediaQuery: true,
               //locale: DevicePreview.locale(context),
               builder: (context, child) {
@@ -74,27 +70,20 @@ class _MyAppState extends State<MyApp> {
                 );
               },
               title: 'School Cafeteria',
-        theme: appTheme,
-        supportedLocales: const [Locale('en'),Locale('tr'), Locale('ar')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate
-        ],
-              locale: _locale ,
-        // localeResolutionCallback: (deviceLocale, supportedLocales) {
-        //   for (var locale in supportedLocales) {
-        //     if (deviceLocale != null &&
-        //         deviceLocale.languageCode == locale.languageCode) {
-        //       return deviceLocale;
-        //     }
-        //   }
-        //
-        //   return supportedLocales.first;
-        // },
-        home:const Splash()
-      ));
+              theme: appTheme,
+              supportedLocales: const [
+                Locale('en'),
+                Locale('tr'),
+                Locale('ar')
+              ],
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate
+              ],
+              locale: _locale,
+              home: const Splash()));
     });
   }
 }

@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:school_cafteria/app_localizations.dart';
 import 'package:school_cafteria/features/account/presentation/bloc/account/account_bloc.dart';
 import 'package:sizer/sizer.dart';
-
 import '../../../../core/util/snackbar_message.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../core/widgets/loading_widget.dart';

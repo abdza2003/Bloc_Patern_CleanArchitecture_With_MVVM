@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_multi_formatter/formatters/formatter_utils.dart';
+import 'package:school_cafteria/appBar.dart';
 import 'package:school_cafteria/app_localizations.dart';
 import 'package:school_cafteria/core/app_theme.dart';
 import 'package:school_cafteria/features/products/presentation/pages/booked_products/booked_day_products.dart';
@@ -45,28 +46,7 @@ class SchoolDays2 extends StatelessWidget {
         },
         child: Scaffold(
             extendBodyBehindAppBar: true,
-            appBar: PreferredSize(
-              preferredSize: Size.fromHeight(10.h + 10.w),
-              child: AppBar(
-                  flexibleSpace: Padding(
-                    padding: EdgeInsets.only(top: 5.h, right: 38.w),
-                    child: Container(
-                      height: 8.h + 7.w,
-                      decoration: const BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage('assets/launcher/logo.png'))),
-                    ),
-                  ),
-                  elevation: 20,
-                  bottomOpacity: 0,
-                  backgroundColor: Colors.white.withOpacity(0.7),
-                  shadowColor: const Color(0xffFF5DB9),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                        bottomRight: Radius.elliptical(1100, 500),
-                        bottomLeft: Radius.elliptical(550, 350)),
-                  )),
-            ),
+            appBar: getAppBar(),
             body: BlocBuilder<ProductsBloc, ProductsState>(
                 buildWhen: (productsBloc, productsState) {
               if (productsState is LoadedSchoolDaysState) {
@@ -110,9 +90,9 @@ class SchoolDays2 extends StatelessWidget {
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: primaryColor,
-                                  shape: RoundedRectangleBorder(
+                                  shape: const RoundedRectangleBorder(
                                       side: BorderSide(color: secondaryColor2),
-                                      borderRadius: const BorderRadius.all(
+                                      borderRadius: BorderRadius.all(
                                           Radius.circular(50))),
                                 ),
                                 onPressed: () {
@@ -234,10 +214,10 @@ class SchoolDays2 extends StatelessWidget {
                                 : null,
                             controller: weeklyBalance,
                             decoration: InputDecoration(
-                              focusedBorder: UnderlineInputBorder(
+                              focusedBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(color: primaryColor),
                               ),
-                              border: UnderlineInputBorder(
+                              border: const UnderlineInputBorder(
                                 borderSide: BorderSide(color: primaryColor),
                               ),
                               hintText:
@@ -252,7 +232,7 @@ class SchoolDays2 extends StatelessWidget {
               );
             }));
   }
-
+  //Right Alignment
   Widget _getRight(String dayName, dynamic totalPrice, int marketCount,
       int restaurantCount, int dayId, BuildContext context) {
     return Align(
@@ -372,7 +352,7 @@ class SchoolDays2 extends StatelessWidget {
                         ),
                       ], color: Colors.white, shape: BoxShape.circle),
                       child:  ImageIcon(
-                        AssetImage("assets/images/market.png"),
+                        const AssetImage("assets/images/market.png"),
                         color: Colors.blue,
                         size:22.sp,
                       ),
@@ -407,7 +387,7 @@ class SchoolDays2 extends StatelessWidget {
                       ),
                     ], color: Colors.white, shape: BoxShape.circle),
                     child: ImageIcon(
-                      AssetImage("assets/images/rest.png"),
+                      const AssetImage("assets/images/rest.png"),
                       color: Colors.pinkAccent,
                       size:22.sp,
 
@@ -418,6 +398,7 @@ class SchoolDays2 extends StatelessWidget {
         ));
   }
 
+  // Left Alignment
   Widget _getLeft(String dayName, dynamic totalPrice, int marketCount,
       int restaurantCount, int dayId, BuildContext context) {
     return Align(
@@ -537,7 +518,7 @@ class SchoolDays2 extends StatelessWidget {
                           ),
                         ], color: Colors.white, shape: BoxShape.circle),
                         child:  ImageIcon(
-                          AssetImage("assets/images/market.png"),
+                          const AssetImage("assets/images/market.png"),
                           color: Colors.blue,
                           size:22.sp,
 
@@ -572,7 +553,7 @@ class SchoolDays2 extends StatelessWidget {
                       ),
                     ], color: Colors.white, shape: BoxShape.circle),
                     child:  ImageIcon(
-                      AssetImage("assets/images/rest.png"),
+                      const AssetImage("assets/images/rest.png"),
                       color: Colors.pinkAccent,
                       size:22.sp,
                     ),

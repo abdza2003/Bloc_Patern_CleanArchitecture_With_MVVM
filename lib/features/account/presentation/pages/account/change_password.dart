@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:school_cafteria/appBar.dart';
 import 'package:school_cafteria/app_localizations.dart';
 import 'package:sizer/sizer.dart';
-
 import '../../../../../core/app_theme.dart';
 import '../../../../../core/navigation.dart';
 import '../../../../../core/util/snackbar_message.dart';
@@ -28,26 +27,7 @@ class MyPageState extends State<ChangePassword> {
   Widget build(BuildContext context) {
     return Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(10.h+10.w),
-          child: AppBar(
-              flexibleSpace:  Padding(
-                padding:  EdgeInsets.only(top:5.h ,right: 38.w),
-                child: Container(
-                  height: 8.h+7.w,
-                  decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/launcher/logo.png'))),),
-              ),
-              elevation: 20,
-              bottomOpacity: 0,
-              backgroundColor: Colors.white.withOpacity(0.7),
-              shadowColor: Color(0xffFF5DB9),
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                    bottomRight: Radius.elliptical(1100, 500),
-                    bottomLeft: Radius.elliptical(550, 350)
-                ),
-              )),
-        ),
+        appBar: getAppBar(),
         body:
         BlocConsumer<AccountBloc, AccountState>(listener: (context, state) {
           if (state is ErrorMsgState) {
@@ -69,7 +49,7 @@ class MyPageState extends State<ChangePassword> {
           child: const LoadingWidget()));
           } else {
             return Container(
-              decoration: BoxDecoration(image: DecorationImage(fit: BoxFit.cover,image: AssetImage('assets/images/bg.png'))),
+              decoration: const BoxDecoration(image: DecorationImage(fit: BoxFit.cover,image: AssetImage('assets/images/bg.png'))),
               child: SingleChildScrollView(
                 child: Column(mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -94,7 +74,7 @@ class MyPageState extends State<ChangePassword> {
                                       filled: true,
                                       //<-- SEE HERE
                                       fillColor: oldPrimaryColor.withOpacity(0.4),
-                                      prefixIcon: Icon(
+                                      prefixIcon: const Icon(
                                         Icons.lock_clock,
                                         color: Colors.white,
                                       ),
@@ -110,7 +90,7 @@ class MyPageState extends State<ChangePassword> {
                                         borderRadius:
                                         BorderRadius.all(Radius.circular(40.0)),
                                       ),
-                                      enabledBorder:  OutlineInputBorder(
+                                      enabledBorder:  const OutlineInputBorder(
                                         borderSide: BorderSide(
                                             color:textColor, width: 1.5),
                                         borderRadius:
@@ -118,7 +98,7 @@ class MyPageState extends State<ChangePassword> {
                                       ),
                                       // errorText: login.userErrorText,
                                       hintText: "CHANGE_PASSWORD_OLD".tr(context),
-                                      hintStyle: TextStyle(color: Colors.white)
+                                      hintStyle: const TextStyle(color: Colors.white)
                                   ),
                                 ),
                               ),
@@ -139,7 +119,7 @@ class MyPageState extends State<ChangePassword> {
                                       filled: true,
                                       //<-- SEE HERE
                                       fillColor: oldPrimaryColor.withOpacity(0.4),
-                                      prefixIcon: Icon(
+                                      prefixIcon: const Icon(
                                         Icons.lock_open,
                                         color: Colors.white,
                                       ),
@@ -155,7 +135,7 @@ class MyPageState extends State<ChangePassword> {
                                         borderRadius:
                                         BorderRadius.all(Radius.circular(40.0)),
                                       ),
-                                      enabledBorder:  OutlineInputBorder(
+                                      enabledBorder:  const OutlineInputBorder(
                                         borderSide: BorderSide(
                                             color: textColor, width: 1.5),
                                         borderRadius:
@@ -163,7 +143,7 @@ class MyPageState extends State<ChangePassword> {
                                       ),
                                       // errorText: login.userErrorText,
                                       hintText: "CHANGE_PASSWORD_NEW".tr(context),
-                                      hintStyle: TextStyle(color: Colors.white)
+                                      hintStyle: const TextStyle(color: Colors.white)
                                   ),
                                 ),
                               ),
@@ -184,7 +164,7 @@ class MyPageState extends State<ChangePassword> {
                                       filled: true,
                                       //<-- SEE HERE
                                       fillColor: oldPrimaryColor.withOpacity(0.4),
-                                      prefixIcon: Icon(
+                                      prefixIcon: const Icon(
                                         Icons.lock,
                                         color: Colors.white,
                                       ),
@@ -200,7 +180,7 @@ class MyPageState extends State<ChangePassword> {
                                         borderRadius:
                                         BorderRadius.all(Radius.circular(40.0)),
                                       ),
-                                      enabledBorder:  OutlineInputBorder(
+                                      enabledBorder:  const OutlineInputBorder(
                                         borderSide: BorderSide(
                                             color: textColor, width: 1.5),
                                         borderRadius:
@@ -208,7 +188,7 @@ class MyPageState extends State<ChangePassword> {
                                       ),
                                       // errorText: login.userErrorText,
                                       hintText: "CHANGE_PASSWORD_CONFIRM".tr(context),
-                                      hintStyle: TextStyle(color: Colors.white)
+                                      hintStyle: const TextStyle(color: Colors.white)
                                   ),
                                 ),
                               ),

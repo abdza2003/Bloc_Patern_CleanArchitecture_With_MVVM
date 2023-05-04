@@ -11,7 +11,6 @@ import 'package:school_cafteria/features/products/presentation/bloc/products_blo
     as pb;
 import 'package:school_cafteria/features/balance/presentation/bloc/balance_bloc.dart'
     as bb;
-import 'package:school_cafteria/features/products/presentation/pages/day_products/school_days.dart';
 import 'package:school_cafteria/features/products/presentation/pages/history/invoices.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../core/navigation.dart';
@@ -95,20 +94,21 @@ class MyPageState extends State<HomePage> {
           },
           child: ListView.builder(
               itemCount: widget.user.childern!.length,
-              // itemCount: user.childern?.length,
-              // useStickyGroupSeparators: true,
-              // optional
               itemBuilder: (context, index) {
+                //set variables to fit in TextForm
                 final name = TextEditingController();
                 final schoolName = TextEditingController();
+
                 schoolName.text = widget.user.childern![index].school!.name!;
                 name.text = widget.user.childern![index].name!;
+
                 final balance = TextEditingController();
                 balance.text = toCurrencyString(
                     widget.user.childern![index].balance.toString(),
                     trailingSymbol:
                         widget.user.childern![index].school!.currencyName!,
                     useSymbolPadding: true);
+
                 return SizedBox(
                     height: 20.h + 26.w,
                     child: Container(
@@ -131,13 +131,13 @@ class MyPageState extends State<HomePage> {
                             color: Colors.transparent,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(
+                                side: const BorderSide(
                                     width: 5, color: oldPrimaryColor),
                                 borderRadius: BorderRadius.circular(30.0)),
                             child: Card(
                               color: Colors.white.withOpacity(0.5),
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(
+                                  side: const BorderSide(
                                       width: 3, color: secondaryColor2),
                                   borderRadius: BorderRadius.circular(25.0)),
                               elevation: 0,
@@ -170,20 +170,7 @@ class MyPageState extends State<HomePage> {
                                       ],
                                     ),
                                   ),
-
-                                  // TextField(
-                                  //   decoration: InputDecoration(
-                                  //     border: InputBorder.none,
-                                  //     prefixIcon: Icon(
-                                  //       Icons
-                                  //           .account_balance_wallet,
-                                  //       color: primaryColor,
-                                  //     ),
-                                  //   ),
-                                  //   readOnly: true,
-                                  //   controller: balance,
-                                  // ),
-                                  DottedLine(dashColor: secondaryColor2),
+                                  const DottedLine(dashColor: secondaryColor2),
                                   SizedBox(
                                     width: 100.w,
                                     height: 24.h,
@@ -206,24 +193,34 @@ class MyPageState extends State<HomePage> {
                                                       width: 30.w,
                                                       fit: BoxFit.fitHeight,
                                                     )
-                                                  :  Container(
+                                                  : Container(
                                                       decoration: BoxDecoration(
                                                           borderRadius:
-                                                          BorderRadius.circular(
-                                                              25.0),
-                                                          border: Border.all(color: primaryColor)),
-                                                      height: 12.h+13.w,
-                                                    child: ClipRRect(
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      25.0),
+                                                          border: Border.all(
+                                                              color:
+                                                                  primaryColor)),
+                                                      height: 12.h + 13.w,
+                                                      child: ClipRRect(
                                                           borderRadius:
-                                                              BorderRadius.circular(
-                                                                  25.0),
-                                                          child:Image(
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      25.0),
+                                                          child: Image(
                                                             fit: BoxFit.cover,
-                                                                image: NetworkImage(
-                                                                    Network().baseUrl + widget.user.childern![index].image!),
-                                                                width: 35.w,
-                                                              )),
-                                                  ),
+                                                            image: NetworkImage(
+                                                                Network()
+                                                                        .baseUrl +
+                                                                    widget
+                                                                        .user
+                                                                        .childern![
+                                                                            index]
+                                                                        .image!),
+                                                            width: 35.w,
+                                                          )),
+                                                    ),
                                             ],
                                           ),
                                         ),
@@ -241,7 +238,8 @@ class MyPageState extends State<HomePage> {
                                                       fontSize: 13.sp,
                                                       fontWeight:
                                                           FontWeight.w700),
-                                                  decoration: InputDecoration(
+                                                  decoration:
+                                                      const InputDecoration(
                                                     border: InputBorder.none,
                                                   ),
                                                   readOnly: true,
@@ -264,57 +262,15 @@ class MyPageState extends State<HomePage> {
                                                                       .circular(
                                                                           15.0)),
                                                     ),
-                                                    onPressed:
-                                                        widget
+                                                    onPressed: widget.user.childern![index].isActive == "0" ? null : () {
+
+                                                            selectStudentSpendingType(context, widget
                                                                     .user
-                                                                    .childern![
-                                                                        index]
-                                                                    .isActive ==
-                                                                "0"
-                                                            ? null
-                                                            : () {
-                                                          selectStudentSpendingType(context,widget.user.childern![index].name!,widget.user.childern![index].id!,widget.user.childern![index].accessTokenParent!,widget.user.childern![index].school!.currencyName!);
-                                                                // if (widget.user.childern![index].weeklyBalance !=
-                                                                //         null &&
-                                                                //     widget
-                                                                //             .user
-                                                                //             .childern![index]
-                                                                //             .weeklyBalance !=
-                                                                //         "0.00") {
-                                                                //   BlocProvider.of<pb.ProductsBloc>(context).add(pb.GetSchoolDaysEvent(
-                                                                //       widget
-                                                                //           .user
-                                                                //           .childern![
-                                                                //               index]
-                                                                //           .id!,
-                                                                //       widget
-                                                                //           .user
-                                                                //           .childern![
-                                                                //               index]
-                                                                //           .accessTokenParent!));
-                                                                //   Go.to(
-                                                                //       context,
-                                                                //       SchoolDays(
-                                                                //         accessToken: widget
-                                                                //             .user
-                                                                //             .childern![index]
-                                                                //             .accessTokenParent!,
-                                                                //         childId: widget
-                                                                //             .user
-                                                                //             .childern![index]
-                                                                //             .id!,
-                                                                //         currency: widget
-                                                                //             .user
-                                                                //             .childern![index]
-                                                                //             .school!
-                                                                //             .currencyName!,
-                                                                //         childName: widget
-                                                                //             .user
-                                                                //             .childern![index]
-                                                                //             .name!,
-                                                                //       ));
-                                                                // } else {
-                                                              },
+                                                                    .childern![index].name!,
+                                                                widget.user.childern![index].id!,
+                                                                widget.user.childern![index].accessTokenParent!,
+                                                                widget.user.childern![index].school!.currencyName!);
+                                                          },
                                                     child: Text(
                                                       "HOME_PAGE_BUTTON1"
                                                           .tr(context),
@@ -342,13 +298,7 @@ class MyPageState extends State<HomePage> {
                                                                           15.0)),
                                                     ),
                                                     onPressed:
-                                                        widget
-                                                                    .user
-                                                                    .childern![
-                                                                        index]
-                                                                    .isActive ==
-                                                                "0"
-                                                            ? null
+                                                        widget.user.childern![index].isActive == "0" ? null
                                                             : () {
                                                                 BlocProvider.of<
                                                                             pb.ProductsBloc>(
@@ -411,17 +361,56 @@ class MyPageState extends State<HomePage> {
                                                                       .circular(
                                                                           15.0)),
                                                     ),
-                                                    onPressed: widget
-                                                                .user
-                                                                .childern![
-                                                                    index]
-                                                                .isActive ==
-                                                            "0"
-                                                        ? null
-                                                        : () {
-                                                      BlocProvider.of<pb.ProductsBloc>(context).add(pb.GetInvoicesEvent(widget.user.childern![index].id!,widget.user.childern![index].accessTokenParent!,null,null));
-                                                      Go.to(context, InvoicesPage(childId: widget.user.childern![index].id!,childImage: widget.user.childern![index].image!, accessToken: widget.user.childern![index].accessTokenParent!,currencyName:widget.user.childern![index].school!.currencyName! ,));
-                                                    },
+                                                    onPressed:
+                                                        widget
+                                                                    .user
+                                                                    .childern![
+                                                                        index]
+                                                                    .isActive ==
+                                                                "0"
+                                                            ? null
+                                                            : () {
+                                                                BlocProvider.of<
+                                                                            pb.ProductsBloc>(
+                                                                        context)
+                                                                    .add(pb.GetInvoicesEvent(
+                                                                        widget
+                                                                            .user
+                                                                            .childern![
+                                                                                index]
+                                                                            .id!,
+                                                                        widget
+                                                                            .user
+                                                                            .childern![index]
+                                                                            .accessTokenParent!,
+                                                                        null,
+                                                                        null));
+                                                                Go.to(
+                                                                    context,
+                                                                    InvoicesPage(
+                                                                      childId: widget
+                                                                          .user
+                                                                          .childern![
+                                                                              index]
+                                                                          .id!,
+                                                                      childImage: widget
+                                                                          .user
+                                                                          .childern![
+                                                                              index]
+                                                                          .image!,
+                                                                      accessToken: widget
+                                                                          .user
+                                                                          .childern![
+                                                                              index]
+                                                                          .accessTokenParent!,
+                                                                      currencyName: widget
+                                                                          .user
+                                                                          .childern![
+                                                                              index]
+                                                                          .school!
+                                                                          .currencyName!,
+                                                                    ));
+                                                              },
 
                                                     child: Text(
                                                       "HOME_PAGE_BUTTON3"
@@ -527,7 +516,7 @@ class MyPageState extends State<HomePage> {
                           elevation: 5,
                           fixedSize: Size(60.w, 8.h),
                           backgroundColor: Colors.white,
-                          side: BorderSide(color: primaryColor)),
+                          side: const BorderSide(color: primaryColor)),
                       onPressed: () {
                         Go.back(context);
                         enterCashPayment(
@@ -544,7 +533,7 @@ class MyPageState extends State<HomePage> {
                           elevation: 5,
                           fixedSize: Size(60.w, 8.h),
                           backgroundColor: Colors.white,
-                          side: BorderSide(color: primaryColor)),
+                          side: const BorderSide(color: primaryColor)),
                       onPressed: null,
                       child: Text("PAYMENT_METHOD_2".tr(context),
                           style:
@@ -578,15 +567,16 @@ class MyPageState extends State<HomePage> {
                               TextStyle(fontSize: 14.sp, color: Colors.green)),
                       onPressed: () async {
                         if (widget.formKey.currentState!.validate()) {
-                          confirmationDialog(context,
-                                  (){Go.back(context);
-                          BlocProvider.of<bb.BalanceBloc>(context).add(
-                              bb.AddBalanceEvent(
-                                  double.parse(widget.balance.text),
-                                  childId,
-                                  accessToken));},
-                              "ADD_CREDIT_CONFIRMATION".tr(context)+widget.balance.text);
-
+                          confirmationDialog(context, () {
+                            Go.back(context);
+                            BlocProvider.of<bb.BalanceBloc>(context).add(
+                                bb.AddBalanceEvent(
+                                    double.parse(widget.balance.text),
+                                    childId,
+                                    accessToken));
+                          },
+                              "ADD_CREDIT_CONFIRMATION".tr(context) +
+                                  widget.balance.text);
                         }
                       }),
                   ElevatedButton(
@@ -621,7 +611,7 @@ class MyPageState extends State<HomePage> {
                   child: Column(
                     children: [
                       Text(
-                        "SET_PAYMENT_BODY".tr(context)+childName,
+                        "SET_PAYMENT_BODY".tr(context) + childName,
                         style: TextStyle(
                             fontSize: 11.sp,
                             color: textColor,
@@ -655,15 +645,16 @@ class MyPageState extends State<HomePage> {
                                         : null,
                                     controller: widget.balance,
                                     decoration: InputDecoration(
-                                      focusedBorder: UnderlineInputBorder(
+                                      focusedBorder: const UnderlineInputBorder(
                                         borderSide:
                                             BorderSide(color: primaryColor),
                                       ),
-                                      border: UnderlineInputBorder(
+                                      border: const UnderlineInputBorder(
                                         borderSide:
                                             BorderSide(color: primaryColor),
                                       ),
-                                      hintStyle: TextStyle(color: textColor),
+                                      hintStyle:
+                                          const TextStyle(color: textColor),
                                       hintText: 'DIALOG_SEARCH_PRICE_TEXT_HINT'
                                           .tr(context),
                                     ),
@@ -692,7 +683,8 @@ class MyPageState extends State<HomePage> {
                 actionsAlignment: MainAxisAlignment.center,
                 actions: <Widget>[
                   ElevatedButton(
-                      child: Text("DIALOG_CONFIRMATION_BUTTON1".tr(context), style: TextStyle(fontSize: 14.sp)),
+                      child: Text("DIALOG_CONFIRMATION_BUTTON1".tr(context),
+                          style: TextStyle(fontSize: 14.sp)),
                       onPressed: () async {
                         if (widget.formKey1.currentState!.validate()) {
                           BlocProvider.of<bb.BalanceBloc>(context).add(
@@ -704,8 +696,8 @@ class MyPageState extends State<HomePage> {
                               const Duration(milliseconds: 1500));
                           if (mounted) {
                             BlocProvider.of<pb.ProductsBloc>(context).add(
-                                pb.GetSchoolProductsByPriceEvent(childId,
-                                    accessToken, null));
+                                pb.GetSchoolProductsByPriceEvent(
+                                    childId, accessToken, null));
                             Go.off(
                                 context,
                                 ProductSearch(
@@ -717,20 +709,9 @@ class MyPageState extends State<HomePage> {
                                   dayName: null,
                                   isWeekly: true,
                                   daysCount: 5,
-                                  weeklyBalance:widget.weeklyBalance.text,
+                                  weeklyBalance: widget.weeklyBalance.text,
                                   childName: childName,
                                 ));
-                            // BlocProvider.of<pb.ProductsBloc>(context).add(
-                            //     pb.GetSchoolDaysEvent(childId, accessToken));
-                            //
-                            // Go.off(
-                            //     context,
-                            //     SchoolDays(
-                            //       accessToken: accessToken,
-                            //       childId: childId,
-                            //       currency: currency,
-                            //       childName: childName,
-                            //     ));
                           }
                         }
                       }),
@@ -740,7 +721,7 @@ class MyPageState extends State<HomePage> {
                           style: TextStyle(fontSize: 14.sp)))
                 ],
                 title: Text(
-                  "SET_WEEKLY_BALANCE".tr(context)+childName,
+                  "SET_WEEKLY_BALANCE".tr(context) + childName,
                   style: TextStyle(fontSize: 11.sp),
                   textAlign: TextAlign.center,
                 ),
@@ -764,10 +745,10 @@ class MyPageState extends State<HomePage> {
                                 : null,
                             controller: widget.weeklyBalance,
                             decoration: InputDecoration(
-                              focusedBorder: UnderlineInputBorder(
+                              focusedBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(color: primaryColor),
                               ),
-                              border: UnderlineInputBorder(
+                              border: const UnderlineInputBorder(
                                 borderSide: BorderSide(color: primaryColor),
                               ),
                               hintText:
@@ -782,8 +763,9 @@ class MyPageState extends State<HomePage> {
               );
             }));
   }
-  void selectStudentSpendingType(
-      BuildContext context, String childName, int childId, String accessToken, String currency) {
+
+  void selectStudentSpendingType(BuildContext context, String childName,
+      int childId, String accessToken, String currency) {
     showDialog<bool>(
         context: context,
         builder: (BuildContext context) {
@@ -791,7 +773,7 @@ class MyPageState extends State<HomePage> {
               titlePadding: EdgeInsets.zero,
               title: SizedBox(
                 height: 8.h,
-                child:  Card(
+                child: Card(
                   color: Colors.white,
                   elevation: 10,
                   child: Center(
@@ -810,24 +792,22 @@ class MyPageState extends State<HomePage> {
                           elevation: 5,
                           fixedSize: Size(60.w, 8.h),
                           backgroundColor: sc2,
-                          side: BorderSide(color: textColor)),
+                          side: const BorderSide(color: textColor)),
                       onPressed: () {
                         Go.back(context);
-                          BlocProvider.of<pb.ProductsBloc>(context).add(pb.GetSchoolDaysEvent(
-                              childId,
-                              accessToken));
-                          Go.to(
-                              context,
-                              SchoolDays2(
-                                accessToken: accessToken,
-                                childId: childId,
-                                currency: currency,
-                                childName: childName,
-                              ));
+                        BlocProvider.of<pb.ProductsBloc>(context)
+                            .add(pb.GetSchoolDaysEvent(childId, accessToken));
+                        Go.to(
+                            context,
+                            SchoolDays2(
+                              accessToken: accessToken,
+                              childId: childId,
+                              currency: currency,
+                              childName: childName,
+                            ));
                       },
                       child: Text("SPENDING_TYPE1".tr(context),
-                          style:
-                          TextStyle(fontSize: 17.sp, color: textColor))),
+                          style: TextStyle(fontSize: 17.sp, color: textColor))),
                   SizedBox(
                     height: 4.h,
                   ),
@@ -836,11 +816,11 @@ class MyPageState extends State<HomePage> {
                           elevation: 5,
                           fixedSize: Size(60.w, 8.h),
                           backgroundColor: sc2,
-                          side: BorderSide(color: textColor)),
-                      onPressed:(){
+                          side: const BorderSide(color: textColor)),
+                      onPressed: () {
                         BlocProvider.of<pb.ProductsBloc>(context).add(
-                            pb.GetSchoolProductsByPriceEvent(childId,
-                                accessToken, null));
+                            pb.GetSchoolProductsByPriceEvent(
+                                childId, accessToken, null));
                         Go.off(
                             context,
                             ProductSearch(
@@ -852,13 +832,12 @@ class MyPageState extends State<HomePage> {
                               dayName: null,
                               isWeekly: true,
                               daysCount: 5,
-                              weeklyBalance:widget.weeklyBalance.text,
+                              weeklyBalance: widget.weeklyBalance.text,
                               childName: childName,
                             ));
                       },
-                        child: Text("SPENDING_TYPE2".tr(context),
-                          style:
-                          TextStyle(fontSize: 17.sp, color: textColor))),
+                      child: Text("SPENDING_TYPE2".tr(context),
+                          style: TextStyle(fontSize: 17.sp, color: textColor))),
                 ],
               ));
         });
