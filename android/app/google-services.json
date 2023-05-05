@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "280124347573",
+    "project_id": "medrese-a1ee0",
+    "storage_bucket": "medrese-a1ee0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:280124347573:android:7eb7f8365bfa268bac5afc",
+        "android_client_info": {
+          "package_name": "com.yes.mederes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "280124347573-ttlnn84ttrhckvtgp0q66bnfm3arnsbb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKqMKDp41H1AiutmAYnp2m2qmGy3t6i9s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "280124347573-ttlnn84ttrhckvtgp0q66bnfm3arnsbb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
