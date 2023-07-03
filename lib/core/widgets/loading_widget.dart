@@ -13,8 +13,10 @@ class LoadingWidget extends StatelessWidget {
       width: 100.w,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children:  [
-          CircularProgressIndicator(color: oldPrimaryColor,),
+        children: [
+          CircularProgressIndicator(
+            color: Colors.white,
+          ),
         ],
       ),
     );

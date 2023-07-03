@@ -62,13 +62,12 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       required this.getDayProductsUsecase,
       required this.deleteDayProductUsecase,
       required this.storeDayProductsUsecase,
-        required this.storeWeekProductsUsecase,
-        required this.getInvoicesUsecase,
-        required this.getHistoryProductsUsecase,
-        required this.storeDayBookedProductsUsecase,
-        required this.getBookedProductsUsecase,
-        required this.getDatedProductsUsecase
-      })
+      required this.storeWeekProductsUsecase,
+      required this.getInvoicesUsecase,
+      required this.getHistoryProductsUsecase,
+      required this.storeDayBookedProductsUsecase,
+      required this.getBookedProductsUsecase,
+      required this.getDatedProductsUsecase})
       : super(ProductsInitial()) {
     on<ProductsEvent>((event, emit) async {
       if (event is GetAllSchoolProductsEvent) {
@@ -79,11 +78,11 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
             (failure) =>
                 emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
             (schoolProducts) {
-              List <ProductModel> pm=schoolProducts.restaurant!+schoolProducts.market!;
-              emit(LoadedProductsSchoolState(products: pm));
-            }
-        );
-            }else if (event is GetAllBannedProductsEvent) {
+          List<ProductModel> pm =
+              schoolProducts.restaurant! + schoolProducts.market!;
+          emit(LoadedProductsSchoolState(products: pm));
+        });
+      } else if (event is GetAllBannedProductsEvent) {
         emit(LoadingState());
         final failureOrProducts =
             await getAllBannedProductsUsecase(event.childId, event.accessToken);
@@ -91,9 +90,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
             (failure) =>
                 emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
             (products) => emit(LoadedBannedState(products: products)));
-
-      }
-      else if (event is DeleteBannedProductsEvent) {
+      } else if (event is DeleteBannedProductsEvent) {
         emit(LoadingState());
         final failureOrUnit = await deleteBannedProductsUsecase(
             event.productId, event.childId, event.accessToken);
@@ -111,156 +108,124 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
             (failure) =>
                 emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
             (_) {
-
-            emit(SuccessMsgState(
+          emit(SuccessMsgState(
+              message: AppLocalizations.instance
+                  .translate("BANNED_PRODUCTS_ADDED")));
+        });
+      } else if (event is DeleteDayProductEvent) {
+        emit(LoadingState());
+        final failureOrUnit = await deleteDayProductUsecase(
+            event.productId, event.childId, event.accessToken, event.dayId);
+        failureOrUnit.fold(
+            (failure) =>
+                emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
+            (_) => emit(SuccessMsgState(
                 message: AppLocalizations.instance
-                    .translate("BANNED_PRODUCTS_ADDED")));
-
-            });
-      }
-      else if (event is DeleteDayProductEvent)
-        {
-          emit(LoadingState());
-          final failureOrUnit = await deleteDayProductUsecase(
-              event.productId, event.childId, event.accessToken,event.dayId);
-          failureOrUnit.fold(
-                  (failure) =>
-                  emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
-                  (_) => emit(SuccessMsgState(
-                  message: AppLocalizations.instance
-                      .translate("PRODUCT_ITEM_DELETE"))));
-        }
-      else if (event is StoreDayProductsEvent)
-        {
-          emit(LoadingState());
-          final failureOrUnit = await storeDayProductsUsecase(
-              event.selectedProducts, event.accessToken);
-          failureOrUnit.fold(
-                  (failure) =>
-                  emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
-                  (_) {
-
-                emit(SuccessMsgState(
-                    message: AppLocalizations.instance
-                        .translate("PRODUCTS_ADDED")));
-
-              });
-        }
-      else if (event is GetDayProductsEvent)
-        {
-          emit(LoadingState());
-          final failureOrSchoolProducts =
-          await getDayProductsUsecase(event.childId, event.accessToken,event.dayId);
-          failureOrSchoolProducts.fold(
-                  (failure) =>
-                  emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
-                  (schoolProducts) {
-                emit(LoadedDayProductsState(products: schoolProducts));
-              }
-          );
-        }
-      else if (event is GetSchoolProductsByPriceEvent)
-        {
-          emit(LoadingState());
-          final failureOrSchoolProducts =
-          await getSchoolProductsByPriceUsecase(event.childId, event.accessToken, event.maxPrice);
-          failureOrSchoolProducts.fold(
-                  (failure) =>
-                  emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
-                  (schoolProducts) {
-                List <ProductModel> pm=schoolProducts.restaurant!+schoolProducts.market!;
-                emit(LoadedSchoolProductsByPriceState(products: pm));
-              }
-          );
-        }
-      else if(event is GetSchoolDaysEvent)
-        {
-          emit(LoadingState());
-          final failureOrWeekDays =
-          await getSchoolDaysUsecase(event.childId, event.accessToken);
-          failureOrWeekDays.fold(
-                  (failure) =>
-                  emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
-                  (weekDays) {
-                emit(LoadedSchoolDaysState(weekDays: weekDays));
-              }
-          );
-        }
-      else if (event is StoreWeekProductsEvent)
-        {
-          emit(LoadingState());
-          final failureOrUnit = await storeWeekProductsUsecase(
-              event.selectedProducts, event.accessToken);
-          failureOrUnit.fold(
-                  (failure) =>
-                  emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
-                  (_) {
-
-                emit(SuccessMsgState(
-                    message: AppLocalizations.instance.translate("PRODUCTS_WEEKLY_ADDED_SUCCESSFULLY")));
-
-              });
-        }
-      else if (event is GetInvoicesEvent)
-        {
-          emit(LoadingState());
-          final failureOrInvoices =
-          await getInvoicesUsecase(event.childId, event.accessToken,event.from,event.to);
-          failureOrInvoices.fold(
-                  (failure) =>
-                  emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
-                  (invoices) {
-                emit(LoadedInvoicesState(invoices: invoices));
-              }
-          );
-        }
-      else if (event is GetHistoryProductsEvent)
-      {
+                    .translate("PRODUCT_ITEM_DELETE"))));
+      } else if (event is StoreDayProductsEvent) {
+        emit(LoadingState());
+        final failureOrUnit = await storeDayProductsUsecase(
+            event.selectedProducts, event.accessToken);
+        failureOrUnit.fold(
+            (failure) =>
+                emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
+            (_) {
+          emit(SuccessMsgState(
+              message: AppLocalizations.instance.translate("PRODUCTS_ADDED")));
+        });
+      } else if (event is GetDayProductsEvent) {
+        emit(LoadingState());
+        final failureOrSchoolProducts = await getDayProductsUsecase(
+            event.childId, event.accessToken, event.dayId);
+        failureOrSchoolProducts.fold(
+            (failure) =>
+                emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
+            (schoolProducts) {
+          emit(LoadedDayProductsState(products: schoolProducts));
+        });
+      } else if (event is GetSchoolProductsByPriceEvent) {
+        emit(LoadingState());
+        final failureOrSchoolProducts = await getSchoolProductsByPriceUsecase(
+            event.childId, event.accessToken, event.maxPrice);
+        failureOrSchoolProducts.fold(
+            (failure) =>
+                emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
+            (schoolProducts) {
+          List<ProductModel> pm =
+              schoolProducts.restaurant! + schoolProducts.market!;
+          emit(LoadedSchoolProductsByPriceState(products: pm));
+        });
+      } else if (event is GetSchoolDaysEvent) {
+        emit(LoadingState());
+        final failureOrWeekDays =
+            await getSchoolDaysUsecase(event.childId, event.accessToken);
+        failureOrWeekDays.fold(
+            (failure) =>
+                emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
+            (weekDays) {
+          emit(LoadedSchoolDaysState(weekDays: weekDays));
+        });
+      } else if (event is StoreWeekProductsEvent) {
+        emit(LoadingState());
+        final failureOrUnit = await storeWeekProductsUsecase(
+            event.selectedProducts, event.accessToken);
+        failureOrUnit.fold(
+            (failure) =>
+                emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
+            (_) {
+          emit(SuccessMsgState(
+              message: AppLocalizations.instance
+                  .translate("PRODUCTS_WEEKLY_ADDED_SUCCESSFULLY")));
+        });
+      } else if (event is GetInvoicesEvent) {
+        emit(LoadingState());
+        final failureOrInvoices = await getInvoicesUsecase(
+            event.childId, event.accessToken, event.from, event.to);
+        failureOrInvoices.fold(
+            (failure) =>
+                emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
+            (invoices) {
+          emit(LoadedInvoicesState(invoices: invoices));
+        });
+      } else if (event is GetHistoryProductsEvent) {
         emit(LoadingState());
         final failureOrHistoryProducts =
-        await getHistoryProductsUsecase(event.invoiceId, event.accessToken);
+            await getHistoryProductsUsecase(event.invoiceId, event.accessToken);
         failureOrHistoryProducts.fold(
-                (failure) =>
+            (failure) =>
                 emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
-                (historyProduct) {
-              emit(LoadedHistoryProductsState(historyProduct: historyProduct));
-            }
-        );
+            (historyProduct) {
+          emit(LoadedHistoryProductsState(historyProduct: historyProduct));
+        });
+      } else if (event is GetBookedProductsEvent) {
+        emit(LoadingState());
+        final failureOrProducts = await getBookedProductsUsecase(
+            event.childId, event.accessToken, event.dayId);
+        failureOrProducts.fold(
+            (failure) =>
+                emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
+            (products) => emit(LoadedBookedProductsState(products: products)));
+      } else if (event is GetDatedProductsEvent) {
+        emit(LoadingState());
+        final failureOrProducts =
+            await getDatedProductsUsecase(event.accessToken, event.dayId);
+        failureOrProducts.fold(
+            (failure) =>
+                emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
+            (products) => emit(LoadedDatedProductsState(products: products)));
+      } else if (event is StoreDayBookedProductsEvent) {
+        emit(LoadingState());
+        final failureOrUnit = await storeDayBookedProductsUsecase(
+            event.selectedProducts, event.accessToken);
+        print('=================${failureOrUnit}');
+        failureOrUnit.fold(
+            (failure) =>
+                emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
+            (_) {
+          emit(SuccessMsgStateStoredBookedProducts(
+              message: AppLocalizations.instance.translate("PRODUCTS_ADDED")));
+        });
       }
-      else if(event is GetBookedProductsEvent)
-        {
-          emit(LoadingState());
-          final failureOrProducts =
-          await getBookedProductsUsecase(event.childId, event.accessToken,event.dayId);
-          failureOrProducts.fold(
-                  (failure) =>
-                  emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
-                  (products) => emit(LoadedBookedProductsState(products: products)));
-        }
-      else if (event is GetDatedProductsEvent)
-        {
-          emit(LoadingState());
-          final failureOrProducts =
-          await getDatedProductsUsecase(event.accessToken,event.dayId);
-          failureOrProducts.fold(
-                  (failure) =>
-                  emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
-                  (products) => emit(LoadedDatedProductsState(products: products)));
-        }
-      else if (event is StoreDayBookedProductsEvent)
-        {
-          emit(LoadingState());
-          final failureOrUnit = await storeDayBookedProductsUsecase(
-              event.selectedProducts, event.accessToken);
-          failureOrUnit.fold(
-                  (failure) =>
-                  emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
-                  (_) {
-                emit(SuccessMsgStateStoredBookedProducts(
-                    message: AppLocalizations.instance.translate("PRODUCTS_ADDED")));
-
-              });
-        }
     });
   }
 

@@ -6,7 +6,11 @@ import 'package:flutter_multi_formatter/formatters/formatter_utils.dart';
 import 'package:school_cafteria/appBar.dart';
 import 'package:school_cafteria/app_localizations.dart';
 import 'package:school_cafteria/core/app_theme.dart';
+import 'package:school_cafteria/core/constants/font_manager.dart';
+import 'package:school_cafteria/core/util/hex_color.dart';
 import 'package:school_cafteria/features/products/presentation/pages/booked_products/booked_day_products.dart';
+import 'package:school_cafteria/scrollviewAppbar.dart';
+import 'package:school_cafteria/test/app_bar_widget.dart';
 import 'package:sizer/sizer.dart';
 import 'package:school_cafteria/features/balance/presentation/bloc/balance_bloc.dart'
     as bb;
@@ -16,7 +20,7 @@ import '../../../../../core/widgets/loading_widget.dart';
 import '../../bloc/products_bloc.dart';
 import 'day_products.dart';
 
-class SchoolDays2 extends StatelessWidget {
+class SchoolDays2 extends StatefulWidget {
   SchoolDays2(
       {Key? key,
       required this.accessToken,
@@ -30,8 +34,39 @@ class SchoolDays2 extends StatelessWidget {
   final String childName;
   final int childId;
 
+  @override
+  State<SchoolDays2> createState() => _SchoolDays2State();
+}
+
+class _SchoolDays2State extends State<SchoolDays2> {
   final weeklyBalance = TextEditingController();
+
   final formKey1 = GlobalKey<FormState>();
+
+  final _scrollController = ScrollController();
+  double maxScroll = 0;
+  double currentScroll = 0;
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    maxScroll = _scrollController.position.maxScrollExtent;
+    currentScroll = _scrollController.offset;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,12 +76,12 @@ class SchoolDays2 extends StatelessWidget {
             SnackBarMessage()
                 .showSuccessSnackBar(message: state.message, context: context);
             BlocProvider.of<ProductsBloc>(context)
-                .add(GetSchoolDaysEvent(childId, accessToken));
+                .add(GetSchoolDaysEvent(widget.childId, widget.accessToken));
           }
         },
         child: Scaffold(
             extendBodyBehindAppBar: true,
-            appBar: getAppBar(),
+            resizeToAvoidBottomInset: false,
             body: BlocBuilder<ProductsBloc, ProductsState>(
                 buildWhen: (productsBloc, productsState) {
               if (productsState is LoadedSchoolDaysState) {
@@ -60,103 +95,168 @@ class SchoolDays2 extends StatelessWidget {
             ) {
               if (state is LoadedSchoolDaysState) {
                 return Container(
-                  decoration: const BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage(
-                            "assets/images/bg.png",
-                          ),
-                          fit: BoxFit.cover)),
-                  child: ListView(
-                    children: [
-                      Card(
-                        shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(15))),
-                        color: Colors.white.withOpacity(0.7),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text(
-                              "SCHOOL_DAYS_WEEK_BALANCE".tr(context) +
-                                  toCurrencyString(
-                                      state.weekDays.weeklyBalance.toString(),
-                                      useSymbolPadding: true,
-                                      trailingSymbol: currency),
-                              style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: textColor,
-                                  fontWeight: FontWeight.w600),
+                  width: 100.w,
+                  height: 100.h,
+                  decoration: BoxDecoration(
+                    color: HexColor('#51093C'),
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      colorFilter: ColorFilter.mode(
+                        Colors.black.withOpacity(0.4),
+                        BlendMode.dstIn,
+                      ),
+                      image: const AssetImage(
+                        'assets/images/back3.png',
+                      ),
+                    ),
+                  ),
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                      SliverAppBar(
+                        expandedHeight: 22.2.h,
+                        pinned: true,
+                        centerTitle: true,
+                        scrolledUnderElevation: 10,
+                        backgroundColor: currentScroll < 16.h
+                            ? Colors.transparent
+                            : primaryColor,
+                        title: currentScroll > 16.h
+                            ? Text(
+                                'MEDRESE',
+                                style: FontManager.impact.copyWith(
+                                    color: Colors.white, letterSpacing: 2),
+                              )
+                            : const SizedBox(),
+                        flexibleSpace: scrollviewAppbar(),
+                      ),
+                      SliverToBoxAdapter(
+                          child: ListView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        children: [
+                          Card(
+                            margin: EdgeInsets.symmetric(horizontal: 2.w),
+                            shape: const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15))),
+                            color: Colors.white.withOpacity(0.7),
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(
+                                    "SCHOOL_DAYS_WEEK_BALANCE".tr(context) +
+                                        toCurrencyString(
+                                            state.weekDays.weeklyBalance
+                                                .toString(),
+                                            useSymbolPadding: true,
+                                            trailingSymbol: widget.currency),
+                                    style: FontManager.kumbhSansBold.copyWith(
+                                        fontSize: 13.sp,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: HexColor('#EA4B6F'),
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(
+                                          color: HexColor('#924C89'),
+                                          width: 2,
+                                        ),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(50),
+                                        ),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      enterWeeklyBalance(
+                                          context,
+                                          widget.childName,
+                                          widget.childId,
+                                          widget.accessToken,
+                                          widget.currency,
+                                          state.weekDays.weeklyBalance);
+                                    },
+                                    child: Text(
+                                      "PRODUCTS_ADD".tr(context),
+                                      style:
+                                          FontManager.kumbhSansBold.copyWith(),
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
-                            ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: primaryColor,
-                                  shape: const RoundedRectangleBorder(
-                                      side: BorderSide(color: secondaryColor2),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(50))),
-                                ),
-                                onPressed: () {
-                                  enterWeeklyBalance(
-                                      context,
-                                      childName,
-                                      childId,
-                                      accessToken,
-                                      currency,
-                                      state.weekDays.weeklyBalance);
-                                },
-                                child: Text("PRODUCTS_ADD".tr(context)))
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(3.h),
-                        child: Center(
-                            child: Text(
-                          "SCHOOL_DAYS_WEEK_PRODUCTS".tr(context) +
-                              toCurrencyString(
-                                  state.weekDays.weeklyProductsPrice.toString(),
-                                  useSymbolPadding: true,
-                                  trailingSymbol: currency),
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12.sp,
-                              color: const Color(0xff701782)),
-                        )),
-                      ),
-                       ListView.builder(
-                         shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: state.weekDays.days!.length,
-                            itemBuilder: (context, index) {
-                              if (index % 2 == 0) {
-                                return _getRight(
-                                    state.weekDays.days![index].dayName!,
-                                    state.weekDays.days![index].productsPrice,
-                                    state.weekDays.days![index].productsCount!,
-                                    state.weekDays.days![index].mealsCount!,
-                                    state.weekDays.days![index].dayId!,
-                                    context);
-                              } else {
-                               return _getLeft(
-                                    state.weekDays.days![index].dayName!,
-                                    state.weekDays.days![index].productsPrice,
-                                    state.weekDays.days![index].productsCount!,
-                                    state.weekDays.days![index].mealsCount!,
-                                    state.weekDays.days![index].dayId!,
-                                    context);
-                              }
-                            }),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(3.h),
+                            child: Center(
+                                child: Text(
+                              "SCHOOL_DAYS_WEEK_PRODUCTS".tr(context) +
+                                  toCurrencyString(
+                                      state.weekDays.weeklyProductsPrice
+                                          .toString(),
+                                      useSymbolPadding: true,
+                                      trailingSymbol: widget.currency),
+                              style: FontManager.kumbhSansBold.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12.sp,
+                                  color: Colors.white),
+                            )),
+                          ),
+                          ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: state.weekDays.days!.length,
+                              itemBuilder: (context, index) {
+                                if (index % 2 == 0) {
+                                  return _getRight(
+                                      state.weekDays.days![index].dayName!,
+                                      state.weekDays.days![index].productsPrice,
+                                      state
+                                          .weekDays.days![index].productsCount!,
+                                      state.weekDays.days![index].mealsCount!,
+                                      state.weekDays.days![index].dayId!,
+                                      context);
+                                } else {
+                                  return _getLeft(
+                                      state.weekDays.days![index].dayName!,
+                                      state.weekDays.days![index].productsPrice,
+                                      state
+                                          .weekDays.days![index].productsCount!,
+                                      state.weekDays.days![index].mealsCount!,
+                                      state.weekDays.days![index].dayId!,
+                                      context);
+                                }
+                              }),
+                        ],
+                      ))
                     ],
                   ),
                 );
               } else {
-                return Container(
-                    decoration: const BoxDecoration(
-                        image: DecorationImage(
-                            fit: BoxFit.cover,
-                            repeat: ImageRepeat.repeat,
-                            image: AssetImage('assets/images/bg.png'))),
-                    child: const LoadingWidget());
+                return Scaffold(
+                    body: Container(
+                  decoration: BoxDecoration(
+                    color: HexColor('#51093C'),
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      colorFilter: ColorFilter.mode(
+                        Colors.black.withOpacity(0.4),
+                        BlendMode.dstIn,
+                      ),
+                      image: const AssetImage(
+                        'assets/images/back3.png',
+                      ),
+                    ),
+                  ),
+                  child: const LoadingWidget(),
+                ));
               }
             })));
   }
@@ -173,7 +273,8 @@ class SchoolDays2 extends StatelessWidget {
                 actionsAlignment: MainAxisAlignment.center,
                 actions: <Widget>[
                   ElevatedButton(
-                      child: Text("DIALOG_CONFIRMATION_BUTTON1".tr(context), style: TextStyle(fontSize: 14.sp)),
+                      child: Text("DIALOG_CONFIRMATION_BUTTON1".tr(context),
+                          style: TextStyle(fontSize: 14.sp)),
                       onPressed: () async {
                         if (formKey1.currentState!.validate()) {
                           BlocProvider.of<bb.BalanceBloc>(context).add(
@@ -190,7 +291,7 @@ class SchoolDays2 extends StatelessWidget {
                           style: TextStyle(fontSize: 14.sp)))
                 ],
                 title: Text(
-                  "SET_WEEKLY_BALANCE".tr(context)+ childName,
+                  "SET_WEEKLY_BALANCE".tr(context) + childName,
                   style: TextStyle(fontSize: 11.sp),
                   textAlign: TextAlign.center,
                 ),
@@ -232,41 +333,53 @@ class SchoolDays2 extends StatelessWidget {
               );
             }));
   }
+
   //Right Alignment
   Widget _getRight(String dayName, dynamic totalPrice, int marketCount,
       int restaurantCount, int dayId, BuildContext context) {
     return Align(
         alignment: Alignment.centerRight,
         child: SizedBox(
-          height: 36.h,
+          height: 35.h,
           width: 60.w,
           child: Stack(
             children: [
               Positioned(
                   left: 25.w,
-                  top: 27.h,
+                  top: 24.2.h,
                   child: SizedBox(
                       width: 30.w,
                       height: 10.h,
                       child: Card(
+                          // margin: EdgeInsets.all(10),
                           shape: const RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15))),
-                          color: Colors.white.withOpacity(0.7),
-                          child: Center(
+                          color: Colors.white.withOpacity(0.57),
+                          child: Container(
+                              // color: Colors.red,
+                              padding: EdgeInsets.only(bottom: 1.h),
+                              alignment: Alignment.bottomCenter,
                               child: Text(
-                            dayName,
-                            style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                                color: primaryColor),
-                          ))))),
+                                dayName,
+                                style: FontManager.dubaiBold.copyWith(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: HexColor('#C53E5D'),
+                                    shadows: [
+                                      Shadow(
+                                        offset: Offset(0.0, 3.0),
+                                        blurRadius: 5.0,
+                                        color: HexColor('#EF738F'),
+                                      ),
+                                    ]),
+                              ))))),
               Positioned(
-                  top: 6.h,
+                  top: 2.h,
                   left: 15.w,
                   child: SizedBox(
                     width: 36.w,
-                    height: 25.h,
+                    height: 27.h,
                     child: Card(
                       elevation: 20,
                       shape: const RoundedRectangleBorder(
@@ -277,12 +390,24 @@ class SchoolDays2 extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Text("MARKET_GROUP_VIEW".tr(context)),
-                              Text(marketCount.toString())
+                              Text(
+                                "MARKET_GROUP_VIEW".tr(context) + '  ',
+                                style: FontManager.poppinsBold
+                                    .copyWith(fontSize: 12.sp),
+                              ),
+                              Text(
+                                marketCount.toString(),
+                                style: FontManager.kumbhSansBold
+                                    .copyWith(fontSize: 10.sp),
+                              )
                             ],
                           ),
-                          const DottedLine(
-                            dashColor: Colors.red,
+                          SizedBox(height: .6.h),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 2.w),
+                            child: const DottedLine(
+                              dashColor: Colors.red,
+                            ),
                           ),
                           SizedBox(
                             height: 3.h,
@@ -290,12 +415,24 @@ class SchoolDays2 extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Text("RESTAURANT_GROUP_VIEW".tr(context)),
-                              Text(restaurantCount.toString())
+                              Text(
+                                "RESTAURANT_GROUP_VIEW".tr(context),
+                                style: FontManager.poppinsBold
+                                    .copyWith(fontSize: 10.sp),
+                              ),
+                              Text(
+                                restaurantCount.toString(),
+                                style: FontManager.kumbhSansBold
+                                    .copyWith(fontSize: 10.sp),
+                              )
                             ],
                           ),
-                          const DottedLine(
-                            dashColor: Colors.red,
+                          SizedBox(height: .6.h),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 2.w),
+                            child: const DottedLine(
+                              dashColor: Colors.red,
+                            ),
                           ),
                           SizedBox(
                             height: 2.h,
@@ -311,11 +448,12 @@ class SchoolDays2 extends StatelessWidget {
                               child: Center(
                                   child: Text(
                                 toCurrencyString(totalPrice.toString(),
-                                    trailingSymbol: currency,
+                                    trailingSymbol: widget.currency,
                                     useSymbolPadding: true),
-                                style: const TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.w700),
+                                style: FontManager.impact.copyWith(
+                                  fontSize: 13.sp,
+                                  color: HexColor('#C53E5D'),
+                                ),
                               )),
                             ),
                           )
@@ -324,76 +462,85 @@ class SchoolDays2 extends StatelessWidget {
                     ),
                   )),
               Positioned(
-                  top: 4.h,
-                  left: 38.w,
-                  child: InkWell(
-                    onTap: () {
-                      BlocProvider.of<ProductsBloc>(context).add(
-                          GetDayProductsEvent(childId, accessToken, dayId));
-                      Go.to(
-                          context,
-                          DayProducts(
-                            accessToken: accessToken,
-                            childId: childId,
-                            dayId: dayId,
-                            currency: currency,
-                            dayName: dayName,
-                            childName: childName,
-                          ));
-                    },
-                    child: Container(
-                      //height: 5.h,width: ,
-                      decoration: BoxDecoration(boxShadow: [
-                        BoxShadow(
-                          color: Colors.red.withOpacity(0.8),
-                          spreadRadius: 1,
-                          blurRadius: 0,
-                          offset: const Offset(0, 4), // changes position of shadow
-                        ),
-                      ], color: Colors.white, shape: BoxShape.circle),
-                      child:  ImageIcon(
-                        const AssetImage("assets/images/market.png"),
-                        color: Colors.blue,
-                        size:22.sp,
-                      ),
-                    ),
-                  )),
-              Positioned(
-                  top: 4.h,
-                  left: 22.w,
-                  child:  InkWell(
+                top: 0.h,
+                right: 14.w,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InkWell(
                       onTap: () {
                         BlocProvider.of<ProductsBloc>(context).add(
-                            GetBookedProductsEvent(childId, accessToken, dayId));
+                            GetBookedProductsEvent(
+                                widget.childId, widget.accessToken, dayId));
                         Go.to(
                             context,
                             BookedDayProducts(
-                              accessToken: accessToken,
-                              childId: childId,
+                              accessToken: widget.accessToken,
+                              childId: widget.childId,
                               dayId: dayId,
-                              currency: currency,
+                              currency: widget.currency,
                               dayName: dayName,
-                              childName: childName,
+                              childName: widget.childName,
                             ));
                       },
-                      child:Container(
-                    //height: 5.h,width: ,
-                    decoration: BoxDecoration(boxShadow: [
-                      BoxShadow(
-                        color: Colors.red.withOpacity(0.8),
-                        spreadRadius: 1,
-                        blurRadius: 0,
-                        offset: const Offset(0, 4), // changes position of shadow
+                      child: Container(
+                        padding: EdgeInsets.all(7.sp),
+                        //height: 5.h,width: ,
+                        decoration: BoxDecoration(boxShadow: [
+                          BoxShadow(
+                            color: Colors.red.withOpacity(0.8),
+                            spreadRadius: 1,
+                            blurRadius: 0,
+                            offset: const Offset(
+                                0, 4), // changes position of shadow
+                          ),
+                        ], color: Colors.white, shape: BoxShape.circle),
+                        child: ImageIcon(
+                          const AssetImage("assets/images/cutlery.png"),
+                          color: HexColor('#E15A70'),
+                          size: 14.sp,
+                        ),
                       ),
-                    ], color: Colors.white, shape: BoxShape.circle),
-                    child: ImageIcon(
-                      const AssetImage("assets/images/rest.png"),
-                      color: Colors.pinkAccent,
-                      size:22.sp,
-
                     ),
-                  )),
-              )],
+                    SizedBox(width: 6.w),
+                    InkWell(
+                      onTap: () {
+                        BlocProvider.of<ProductsBloc>(context).add(
+                            GetDayProductsEvent(
+                                widget.childId, widget.accessToken, dayId));
+                        Go.to(
+                            context,
+                            DayProducts(
+                              accessToken: widget.accessToken,
+                              childId: widget.childId,
+                              dayId: dayId,
+                              currency: widget.currency,
+                              dayName: dayName,
+                              childName: widget.childName,
+                            ));
+                      },
+                      child: Container(
+                          padding: EdgeInsets.all(7.sp),
+                          //height: 5.h,width: ,
+                          decoration: BoxDecoration(boxShadow: [
+                            BoxShadow(
+                              color: Colors.red.withOpacity(0.8),
+                              spreadRadius: 1,
+                              blurRadius: 0,
+                              offset: const Offset(
+                                  0, 4), // changes position of shadow
+                            ),
+                          ], color: Colors.white, shape: BoxShape.circle),
+                          child: ImageIcon(
+                            const AssetImage("assets/images/grocery-store.png"),
+                            color: HexColor('#5D8DFF'),
+                            size: 14.sp,
+                          )),
+                    ),
+                  ],
+                ),
+              )
+            ],
           ),
         ));
   }
@@ -404,35 +551,47 @@ class SchoolDays2 extends StatelessWidget {
     return Align(
         alignment: Alignment.centerLeft,
         child: SizedBox(
-          height: 36.h,
+          height: 35.h,
           width: 60.w,
           child: Stack(
             children: [
               Positioned(
-                  left: 5.w,
-                  top: 27.h,
-                  child: SizedBox(
-                      width: 30.w,
-                      height: 10.h,
-                      child: Card(
-                          shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                          color: Colors.white.withOpacity(0.7),
-                          child: Center(
-                              child: Text(
-                            dayName,
-                            style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                                color: primaryColor),
-                          ))))),
+                left: 5.w,
+                top: 24.2.h,
+                child: SizedBox(
+                  width: 30.w,
+                  height: 10.h,
+                  child: Card(
+                    shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(15))),
+                    color: Colors.white.withOpacity(0.57),
+                    child: Container(
+                      padding: EdgeInsets.only(bottom: 1.h),
+                      alignment: Alignment.bottomCenter,
+                      child: Text(
+                        dayName,
+                        style: FontManager.dubaiBold.copyWith(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: HexColor('#C53E5D'),
+                            shadows: [
+                              Shadow(
+                                offset: Offset(0.0, 3.0),
+                                blurRadius: 5.0,
+                                color: HexColor('#EF738F'),
+                              ),
+                            ]),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               Positioned(
-                  top: 6.h,
+                  top: 2.h,
                   right: 15.w,
                   child: SizedBox(
                     width: 36.w,
-                    height: 25.h,
+                    height: 27.h,
                     child: Card(
                       elevation: 20,
                       shape: const RoundedRectangleBorder(
@@ -443,12 +602,24 @@ class SchoolDays2 extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Text("MARKET_GROUP_VIEW".tr(context)),
-                              Text(marketCount.toString())
+                              Text(
+                                "MARKET_GROUP_VIEW".tr(context) + '  ',
+                                style: FontManager.poppinsBold
+                                    .copyWith(fontSize: 12.sp),
+                              ),
+                              Text(
+                                marketCount.toString(),
+                                style: FontManager.kumbhSansBold
+                                    .copyWith(fontSize: 10.sp),
+                              )
                             ],
                           ),
-                          const DottedLine(
-                            dashColor: Colors.red,
+                          SizedBox(height: .6.h),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 2.w),
+                            child: const DottedLine(
+                              dashColor: Colors.red,
+                            ),
                           ),
                           SizedBox(
                             height: 3.h,
@@ -456,12 +627,24 @@ class SchoolDays2 extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Text("RESTAURANT_GROUP_VIEW".tr(context)),
-                              Text(restaurantCount.toString())
+                              Text(
+                                "RESTAURANT_GROUP_VIEW".tr(context),
+                                style: FontManager.poppinsBold
+                                    .copyWith(fontSize: 10.sp),
+                              ),
+                              Text(
+                                restaurantCount.toString(),
+                                style: FontManager.kumbhSansBold
+                                    .copyWith(fontSize: 10.sp),
+                              )
                             ],
                           ),
-                          const DottedLine(
-                            dashColor: Colors.red,
+                          SizedBox(height: .6.h),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 2.w),
+                            child: const DottedLine(
+                              dashColor: Colors.red,
+                            ),
                           ),
                           SizedBox(
                             height: 2.h,
@@ -477,11 +660,12 @@ class SchoolDays2 extends StatelessWidget {
                               child: Center(
                                   child: Text(
                                 toCurrencyString(totalPrice.toString(),
-                                    trailingSymbol: currency,
+                                    trailingSymbol: widget.currency,
                                     useSymbolPadding: true),
-                                style: const TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.w700),
+                                style: FontManager.impact.copyWith(
+                                  fontSize: 13.sp,
+                                  color: HexColor('#C53E5D'),
+                                ),
                               )),
                             ),
                           )
@@ -490,75 +674,85 @@ class SchoolDays2 extends StatelessWidget {
                     ),
                   )),
               Positioned(
-                  top: 4.h,
-                  left: 32.w,
-                  child: InkWell(
-                    onTap: () {
-                      BlocProvider.of<ProductsBloc>(context).add(
-                          GetDayProductsEvent(childId, accessToken, dayId));
-                      Go.to(
-                          context,
-                          DayProducts(
-                            accessToken: accessToken,
-                            childId: childId,
-                            dayId: dayId,
-                            currency: currency,
-                            dayName: dayName,
-                            childName: childName,
-                          ));
-                    },
-                    child: Container(
+                top: 0.h,
+                left: 15.w,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        BlocProvider.of<ProductsBloc>(context).add(
+                            GetBookedProductsEvent(
+                                widget.childId, widget.accessToken, dayId));
+                        Go.to(
+                            context,
+                            BookedDayProducts(
+                              accessToken: widget.accessToken,
+                              childId: widget.childId,
+                              dayId: dayId,
+                              currency: widget.currency,
+                              dayName: dayName,
+                              childName: widget.childName,
+                            ));
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(7.sp),
                         //height: 5.h,width: ,
                         decoration: BoxDecoration(boxShadow: [
                           BoxShadow(
                             color: Colors.red.withOpacity(0.8),
                             spreadRadius: 1,
                             blurRadius: 0,
-                            offset: const Offset(0, 4), // changes position of shadow
+                            offset: const Offset(
+                                0, 4), // changes position of shadow
                           ),
                         ], color: Colors.white, shape: BoxShape.circle),
-                        child:  ImageIcon(
-                          const AssetImage("assets/images/market.png"),
-                          color: Colors.blue,
-                          size:22.sp,
-
-                        )),
-                  )),
-              Positioned(
-                  top: 4.h,
-                  left:16.w,
-                  child: InkWell(
+                        child: ImageIcon(
+                          const AssetImage("assets/images/cutlery.png"),
+                          color: HexColor('#E15A70'),
+                          size: 14.sp,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 6.w),
+                    InkWell(
                       onTap: () {
                         BlocProvider.of<ProductsBloc>(context).add(
-                            GetBookedProductsEvent(childId, accessToken, dayId));
+                            GetDayProductsEvent(
+                                widget.childId, widget.accessToken, dayId));
                         Go.to(
                             context,
-                            BookedDayProducts(
-                              accessToken: accessToken,
-                              childId: childId,
+                            DayProducts(
+                              accessToken: widget.accessToken,
+                              childId: widget.childId,
                               dayId: dayId,
-                              currency: currency,
+                              currency: widget.currency,
                               dayName: dayName,
-                              childName: childName,
+                              childName: widget.childName,
                             ));
                       },
                       child: Container(
-                    //height: 5.h,width: ,
-                    decoration: BoxDecoration(boxShadow: [
-                      BoxShadow(
-                        color: Colors.red.withOpacity(0.8),
-                        spreadRadius: 1,
-                        blurRadius: 0,
-                        offset: const Offset(0, 4), // changes position of shadow
-                      ),
-                    ], color: Colors.white, shape: BoxShape.circle),
-                    child:  ImageIcon(
-                      const AssetImage("assets/images/rest.png"),
-                      color: Colors.pinkAccent,
-                      size:22.sp,
+                          padding: EdgeInsets.all(7.sp),
+                          //height: 5.h,width: ,
+                          decoration: BoxDecoration(boxShadow: [
+                            BoxShadow(
+                              color: Colors.red.withOpacity(0.8),
+                              spreadRadius: 1,
+                              blurRadius: 0,
+                              offset: const Offset(
+                                  0, 4), // changes position of shadow
+                            ),
+                          ], color: Colors.white, shape: BoxShape.circle),
+                          child: ImageIcon(
+                            const AssetImage("assets/images/grocery-store.png"),
+                            color: HexColor('#5D8DFF'),
+                            size: 14.sp,
+                          )),
                     ),
-                  )),
-              )],
+                  ],
+                ),
+              )
+            ],
           ),
         ));
   }

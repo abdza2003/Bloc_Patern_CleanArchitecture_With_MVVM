@@ -1,24 +1,23 @@
-
-class Product  {
-  int? id;
-  String? name;
-  String? barcode;
-  String? image;
-  String? description;
-  String? price;
-  String? modelType;
-  String? modelId;
-  String? createdAt;
-  String? updatedAt;
-  String? showOnMobile;
+class Product {
+  var id;
+  var name;
+  var barcode;
+  var image;
+  var description;
+  var price;
+  var modelType;
+  var modelId;
+  var createdAt;
+  var updatedAt;
+  var showOnMobile;
   dynamic quantity;
-  bool selected=false;
-  String isMarket="true";
+  bool selected = false;
+  var isMarket = "true";
   bool? isAvailableToBook;
   RestaurantDatedProduct? restaurantDatedProduct;
 
-  Product({
-      this.id,
+  Product(
+      {this.id,
       this.name,
       this.barcode,
       this.image,
@@ -30,28 +29,29 @@ class Product  {
       this.updatedAt,
       this.showOnMobile,
       this.quantity,
-    this.isAvailableToBook,
-    this.restaurantDatedProduct
-  });
+      this.isAvailableToBook,
+      this.restaurantDatedProduct});
 }
+
 class RestaurantDatedProduct {
-  int? id;
-  String? availableQuantity;
-  String? availableDate;
-  String? productId;
-  String? createdAt;
-  String? updatedAt;
-  String? dayName;
+  var id;
+  var availableQuantity;
+  var availableDate;
+  var productId;
+  var createdAt;
+  var updatedAt;
+  var dayName;
   dynamic dayId;
 
-  RestaurantDatedProduct({this.id,
-    this.availableQuantity,
-    this.availableDate,
-    this.productId,
-    this.createdAt,
-    this.updatedAt,
-    this.dayName,
-    this.dayId});
+  RestaurantDatedProduct(
+      {this.id,
+      this.availableQuantity,
+      this.availableDate,
+      this.productId,
+      this.createdAt,
+      this.updatedAt,
+      this.dayName,
+      this.dayId});
 
   RestaurantDatedProduct.fromJson(Map<String, dynamic> json) {
     id = json['id'];

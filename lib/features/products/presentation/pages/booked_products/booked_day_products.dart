@@ -6,10 +6,13 @@ import 'package:flutter_multi_formatter/formatters/formatter_utils.dart';
 import 'package:intl/intl.dart';
 import 'package:school_cafteria/appBar.dart';
 import 'package:school_cafteria/app_localizations.dart';
+import 'package:school_cafteria/core/constants/font_manager.dart';
+import 'package:school_cafteria/core/util/hex_color.dart';
 import 'package:school_cafteria/core/widgets/loading_widget.dart';
 import 'package:school_cafteria/features/products/presentation/bloc/products_bloc.dart';
 import 'package:school_cafteria/features/products/presentation/pages/booked_products/school_dated_product_page.dart';
 import 'package:school_cafteria/features/products/presentation/pages/day_products/products_search_by_price.dart';
+import 'package:school_cafteria/test/app_bar_widget.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../../core/app_theme.dart';
 import '../../../../../core/navigation.dart';
@@ -39,17 +42,23 @@ class BookedDayProducts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: getAppBar(),
-        // float button location in terms of language
         floatingActionButtonLocation:
             AppLocalizations.of(context)!.locale!.languageCode != 'ar'
                 ? FloatingActionButtonLocation.endFloat
                 : FloatingActionButtonLocation.startFloat,
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            BlocProvider.of<ProductsBloc>(context).add(GetDatedProductsEvent(accessToken,dayId));
-            Go.to(context, SchoolDatedProduct(accessToken: accessToken, childId: childId, currency: currency, dayId: dayId, dayName: dayName, childName: childName));
+            BlocProvider.of<ProductsBloc>(context)
+                .add(GetDatedProductsEvent(accessToken, dayId));
+            Go.to(
+                context,
+                SchoolDatedProduct(
+                    accessToken: accessToken,
+                    childId: childId,
+                    currency: currency,
+                    dayId: dayId,
+                    dayName: dayName,
+                    childName: childName));
           },
           child: const Icon(Icons.add),
         ),
@@ -63,7 +72,6 @@ class BookedDayProducts extends StatelessWidget {
                 .showSuccessSnackBar(message: state.message, context: context);
             BlocProvider.of<ProductsBloc>(context)
                 .add(GetBookedProductsEvent(childId, accessToken, dayId));
-
           }
         }, buildWhen: (productsBloc, productsState) {
           if (productsState is LoadedBookedProductsState) {
@@ -76,202 +84,241 @@ class BookedDayProducts extends StatelessWidget {
           state,
         ) {
           if (state is LoadingState) {
-            return Scaffold(body: Container(
-                decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        fit: BoxFit.cover,
-                        repeat: ImageRepeat.repeat,
-                        image: AssetImage('assets/images/bg.png'))),
-                child: const  LoadingWidget()));
+            return Scaffold(
+                body: Container(
+              decoration: BoxDecoration(
+                color: HexColor('#51093C'),
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.4),
+                    BlendMode.dstIn,
+                  ),
+                  image: const AssetImage(
+                    'assets/images/back3.png',
+                  ),
+                ),
+              ),
+              child: const LoadingWidget(),
+            ));
           } else if (state is LoadedBookedProductsState) {
-            return Container(
-                    decoration: const BoxDecoration(
-                        image: DecorationImage(
-                            fit: BoxFit.cover,
-                            repeat: ImageRepeat.repeat,
-                            image: AssetImage('assets/images/bg.png'))),
+            return Stack(
+              children: [
+                Container(
+                    padding: EdgeInsets.only(top: 20.h),
+                    decoration: BoxDecoration(
+                      color: HexColor('#51093C'),
+                      image: DecorationImage(
+                        fit: BoxFit.cover,
+                        colorFilter: ColorFilter.mode(
+                          Colors.black.withOpacity(0.4),
+                          BlendMode.dstIn,
+                        ),
+                        image: const AssetImage(
+                          'assets/images/back3.png',
+                        ),
+                      ),
+                    ),
                     child: ListView(children: [
                       SizedBox(
                         height: 2.h,
                       ),
-                      Center(
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: 2.w),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            new BoxShadow(
+                              // spreadRadius: 0,
+                              offset: Offset(0, 0),
+                              color: Colors.white.withOpacity(.4),
+                              blurRadius: 20.0,
+                            ),
+                          ],
+                        ),
                         child: Card(
+                          margin: EdgeInsets.symmetric(horizontal: 2.w),
                           color: Colors.white.withOpacity(0.7),
                           elevation: 5,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0)),
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
                           child: SizedBox(
-                            height: 5.h,
+                            height: 6.h,
                             width: 66.w,
                             child: Center(
-                                child: Text("PRODUCTS_LIST".tr(context),
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: textColor,
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w700))),
+                              child: Text(
+                                "PRODUCTS_LIST".tr(context),
+                                textAlign: TextAlign.center,
+                                style: FontManager.kumbhSansBold.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                       ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: state.products.length,
-                              itemBuilder: (context, index) {
-                                return SizedBox(
-                                  height: 7.h + 20.w,
-                                  child: Row(
+                      ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: state.products.length,
+                          itemBuilder: (context, index) {
+                            return SizedBox(
+                              height: 7.h + 20.w,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                      padding: EdgeInsets.all(0.4.h),
+                                      child: ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            minWidth: 35.w,
+                                            maxWidth: 35.w,
+                                            maxHeight: 20.h,
+                                            minHeight: 20.h,
+                                          ),
+                                          child: state.products[index].image ==
+                                                  null
+                                              ? Image.asset(
+                                                  'assets/launcher/logo.png',
+                                                  scale: 15.0,
+                                                )
+                                              : Container(
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.white70,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              25.0),
+                                                      border: Border.all(
+                                                          color: primaryColor)),
+                                                  height: 12.h + 13.w,
+                                                  child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              25.0),
+                                                      child: Image(
+                                                        fit: BoxFit.cover,
+                                                        image: NetworkImage(
+                                                            Network().baseUrl +
+                                                                state
+                                                                    .products[
+                                                                        index]
+                                                                    .image!),
+                                                        width: 35.w,
+                                                      )),
+                                                ))),
+                                  Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      Padding(
-                                              padding: EdgeInsets.all(0.4.h),
-                                              child: ConstrainedBox(
-                                                  constraints: BoxConstraints(
-                                                    minWidth: 35.w,
-                                                    maxWidth: 35.w,
-                                                    maxHeight: 20.h,
-                                                    minHeight: 20.h,
-                                                  ),
-                                                  child: state.products[index]
-                                                              .image ==
-                                                          null
-                                                      ? Image.asset(
-                                                          'assets/launcher/logo.png',
-                                                          scale: 15.0,
-                                                        )
-                                                      : Container(
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.white70,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          25.0),
-                                                              border: Border.all(
-                                                                  color:
-                                                                      primaryColor)),
-                                                          height: 12.h + 13.w,
-                                                          child: ClipRRect(
-                                                              borderRadius: BorderRadius.circular(25.0),
-                                                              child: Image(
-                                                                fit: BoxFit.cover,
-                                                                image: NetworkImage(Network().baseUrl + state.products[index].image!),
-                                                                width: 35.w,
-                                                              )),
-                                                        )
-                                              )),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
                                                 0.37,
-                                            child: Padding(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  1.w, 1.h, 0, 0),
-                                              child: Row(
-                                                children: [
-                                                  AutoSizeText(
-                                                    state.products[index].name!,
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 13.sp,
-                                                    ),
-                                                  ),
-                                                  state.products[index]
-                                                                  .quantity ==
-                                                              0 ||
-                                                          state.products[index]
-                                                                  .quantity ==
-                                                              null
-                                                      ? const SizedBox()
-                                                      : Text(
-                                                          "X ${state.products[index].quantity}")
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.37,
-                                            height: 9.h,
-                                            child: Padding(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  1.w, 1.h, 0, 0),
-                                              child: AutoSizeText(
-                                                "${state.products[index]
-                                                        .description ??
-                                                    state.products[index].name!}\n${DateFormat('dd/MM/yyyy').format(DateTime.parse(state.products[index].restaurantDatedProduct!.availableDate!))}",
+                                        child: Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              1.w, 1.h, 0, 0),
+                                          child: Row(
+                                            children: [
+                                              AutoSizeText(
+                                                state.products[index].name!,
                                                 style: TextStyle(
-                                                  fontSize: 11.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 13.sp,
                                                 ),
                                               ),
-                                            ),
+                                              state.products[index].quantity ==
+                                                          0 ||
+                                                      state.products[index]
+                                                              .quantity ==
+                                                          null
+                                                  ? const SizedBox()
+                                                  : Text(
+                                                      "X ${state.products[index].quantity}")
+                                            ],
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                      Column(
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: EdgeInsets.fromLTRB(
-                                                0, 1.h, 0, 0),
-                                            child: Text(
-                                              toCurrencyString(
-                                                  state.products[index].price!,
-                                                  trailingSymbol: currency,
-                                                  useSymbolPadding: true),
-                                              style: TextStyle(
-                                                  fontSize: 11.sp,
-                                                  fontWeight: FontWeight.bold),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.37,
+                                        height: 9.h,
+                                        child: Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              1.w, 1.h, 0, 0),
+                                          child: AutoSizeText(
+                                            "${state.products[index].description ?? state.products[index].name!}\n${DateFormat('dd/MM/yyyy').format(DateTime.parse(state.products[index].restaurantDatedProduct!.availableDate!))}",
+                                            style: TextStyle(
+                                              fontSize: 11.sp,
                                             ),
                                           ),
-                                          Padding(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  0.w, 2.h, 0, 0),
-                                              child: ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20),
-                                                    )),
-                                                onPressed: () {
-                                                  confirmationDialog(context,(){BlocProvider.of<ProductsBloc>(
-                                                      context)
-                                                      .add(
-                                                      DeleteDayProductEvent(
-                                                          state
-                                                              .products[
-                                                          index]
-                                                              .id!,
-                                                          childId,
-                                                          accessToken,
-                                                          dayId));},"PRODUCT_REMOVE_DAY_CONFIRMATION".tr(context));
-
-                                                },
-                                                child: Text(
-                                                  "PRODUCTS_LIST_DELETE".tr(context),
-                                                  style: TextStyle(
-                                                      color: Colors.red,
-                                                      fontSize: 15.sp),
-                                                ),
-                                              ))
-                                        ],
+                                        ),
                                       ),
                                     ],
                                   ),
-                                );
-                              })
-                    ]));
+                                  Column(
+                                    children: <Widget>[
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.fromLTRB(0, 1.h, 0, 0),
+                                        child: Text(
+                                          toCurrencyString(
+                                              '${state.products[index].price!}',
+                                              trailingSymbol: currency,
+                                              useSymbolPadding: true),
+                                          style: TextStyle(
+                                              fontSize: 11.sp,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              0.w, 2.h, 0, 0),
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                )),
+                                            onPressed: () {
+                                              confirmationDialog(context, () {
+                                                BlocProvider.of<ProductsBloc>(
+                                                        context)
+                                                    .add(DeleteDayProductEvent(
+                                                        state.products[index]
+                                                            .id!,
+                                                        childId,
+                                                        accessToken,
+                                                        dayId));
+                                              },
+                                                  "PRODUCT_REMOVE_DAY_CONFIRMATION"
+                                                      .tr(context));
+                                            },
+                                            child: Text(
+                                              "PRODUCTS_LIST_DELETE"
+                                                  .tr(context),
+                                              style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 15.sp),
+                                            ),
+                                          ))
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          })
+                    ])),
+                AppbarWidget(
+                  offset: -42.h,
+                  offsetLogo: 1.h,
+                ),
+              ],
+            );
           } else {
             return const SizedBox();
           }

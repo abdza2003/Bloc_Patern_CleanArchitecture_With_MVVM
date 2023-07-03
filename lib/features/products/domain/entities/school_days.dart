@@ -1,13 +1,18 @@
 import 'package:equatable/equatable.dart';
 
-class SchoolDays  extends Equatable {
-  int? dayId;
-  String? dayName;
-  int? productsCount;
-  int? mealsCount;
+class SchoolDays extends Equatable {
+  dynamic dayId;
+  dynamic dayName;
+  dynamic productsCount;
+  dynamic mealsCount;
   dynamic productsPrice;
 
-  SchoolDays({this.dayId, this.dayName, this.productsCount, this.productsPrice,this.mealsCount});
+  SchoolDays(
+      {this.dayId,
+      this.dayName,
+      this.productsCount,
+      this.productsPrice,
+      this.mealsCount});
 
   @override
   // TODO: implement props

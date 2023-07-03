@@ -1,12 +1,20 @@
+import 'dart:io';
+
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:school_cafteria/appBar.dart';
 import 'package:school_cafteria/app_localizations.dart';
+import 'package:school_cafteria/core/constants/font_manager.dart';
+import 'package:school_cafteria/core/util/hex_color.dart';
 import 'package:school_cafteria/features/products/data/models/products_model.dart';
 import 'package:school_cafteria/features/products/domain/entities/selected_products_quantity.dart';
+import 'package:school_cafteria/scrollviewAppbar.dart';
+import 'package:school_cafteria/test/app_bar_widget.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../../core/app_theme.dart';
 import '../../../../../core/navigation.dart';
@@ -43,6 +51,31 @@ class SchoolDatedProduct extends StatefulWidget {
 }
 
 class MyPageState extends State<SchoolDatedProduct> {
+  final _scrollController = ScrollController();
+  double maxScroll = 0;
+  double currentScroll = 0;
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    maxScroll = _scrollController.position.maxScrollExtent;
+    currentScroll = _scrollController.offset;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ProductsBloc, ProductsState>(
@@ -51,309 +84,667 @@ class MyPageState extends State<SchoolDatedProduct> {
         SnackBarMessage()
             .showErrorSnackBar(message: state.message, context: context);
       } else if (state is SuccessMsgStateStoredBookedProducts) {
-         SnackBarMessage()
-             .showSuccessSnackBar(message: state.message, context: context);
-          BlocProvider.of<ProductsBloc>(context).add(GetBookedProductsEvent(
-              widget.childId, widget.accessToken, widget.dayId!));
+        SnackBarMessage()
+            .showSuccessSnackBar(message: state.message, context: context);
+        BlocProvider.of<ProductsBloc>(context).add(GetBookedProductsEvent(
+            widget.childId, widget.accessToken, widget.dayId!));
         Go.back(context);
       }
     }, builder: (context, state) {
       if (state is LoadingState) {
-        return Scaffold(body: Container(
-            decoration: const BoxDecoration(
-                image: DecorationImage(
-                    fit: BoxFit.cover,
-                    repeat: ImageRepeat.repeat,
-                    image: AssetImage('assets/images/bg.png'))),
-            child: const LoadingWidget()));
+        return Scaffold(
+            body: Container(
+          decoration: BoxDecoration(
+            color: HexColor('#51093C'),
+            image: DecorationImage(
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                Colors.black.withOpacity(0.4),
+                BlendMode.dstIn,
+              ),
+              image: const AssetImage(
+                'assets/images/back3.png',
+              ),
+            ),
+          ),
+          child: const LoadingWidget(),
+        ));
       } else if (state is LoadedDatedProductsState) {
         if (state.products.isEmpty) {
-          return  Scaffold(
-            extendBodyBehindAppBar: true,
-              appBar:getAppBar(),
-              body: const NoPageFound());
+          return Scaffold(body: const NoPageFound());
         } else {
           return Scaffold(
-              extendBody: true,
-              extendBodyBehindAppBar: true,
-              appBar: getAppBar(),
-              bottomNavigationBar: Padding(
-                padding: EdgeInsets.only(left: 35.w, right: 35.w),
-                child: ElevatedButton(
-                  style:
-                      ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0)),
-                          backgroundColor: Colors.white),
-                  onPressed: () {
-                    //ordering the products in terms of market or meal
-                    SelectedProductsQuantityModel selectedProductsModel =
-                            SelectedProductsQuantityModel();
-                        selectedProductsModel.mealsIds = [];
-                        selectedProductsModel.productsIds = [];
-                        for (var pr in state.products) {
-                          if (pr.quantity!=null && pr.quantity > 0) {
-                            if (pr.isMarket == "true") {
-                              selectedProductsModel.productsIds!.add(
-                                  ProductSelection(
-                                      id: pr.id!, quantity: pr.quantity!));
-                            } else {
-                              selectedProductsModel.mealsIds!.add(
-                                  ProductSelection(
-                                      id: pr.id!, quantity: pr.quantity!));
-                            }
-                          }
-                        }
-                        selectedProductsModel.studentId = widget.childId;
-                        selectedProductsModel.dayId = widget.dayId;
-                        BlocProvider.of<ProductsBloc>(context).add(
-                            StoreDayBookedProductsEvent(
-                                selectedProductsModel, widget.accessToken));
-                      },
-                  child: Text(
-                    "PRODUCT_NAV_BOTTOM".tr(context),
-                    style: TextStyle(fontSize: 15.sp, color: Colors.green),
+            floatingActionButtonLocation:
+                AppLocalizations.of(context)!.locale!.languageCode != 'ar'
+                    ? FloatingActionButtonLocation.endFloat
+                    : FloatingActionButtonLocation.startFloat,
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: HexColor('#EA4B6F'),
+              child: Icon(Icons.check),
+              onPressed: () {
+                //ordering the products in terms of market or meal
+                SelectedProductsQuantityModel selectedProductsModel =
+                    SelectedProductsQuantityModel();
+                selectedProductsModel.mealsIds = [];
+                selectedProductsModel.productsIds = [];
+                for (var pr in state.products) {
+                  if (pr.quantity != null && pr.quantity > 0) {
+                    if (pr.isMarket == "true") {
+                      selectedProductsModel.productsIds!.add(
+                          ProductSelection(id: pr.id!, quantity: pr.quantity!));
+                    } else {
+                      selectedProductsModel.mealsIds!.add(
+                          ProductSelection(id: pr.id!, quantity: pr.quantity!));
+                    }
+                  }
+                }
+                selectedProductsModel.studentId = widget.childId;
+                selectedProductsModel.dayId = widget.dayId;
+                BlocProvider.of<ProductsBloc>(context).add(
+                    StoreDayBookedProductsEvent(
+                        selectedProductsModel, widget.accessToken));
+              },
+            ),
+            // bottomNavigationBar: Padding(
+            //   padding: EdgeInsets.only(left: 35.w, right: 35.w),
+            //   child: ElevatedButton(
+            //     style: ElevatedButton.styleFrom(
+            //         shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(30.0)),
+            //         backgroundColor: Colors.white),
+            //     onPressed: () {
+            //       //ordering the products in terms of market or meal
+            //       SelectedProductsQuantityModel selectedProductsModel =
+            //           SelectedProductsQuantityModel();
+            //       selectedProductsModel.mealsIds = [];
+            //       selectedProductsModel.productsIds = [];
+            //       for (var pr in state.products) {
+            //         if (pr.quantity != null && pr.quantity > 0) {
+            //           if (pr.isMarket == "true") {
+            //             selectedProductsModel.productsIds!.add(
+            //                 ProductSelection(
+            //                     id: pr.id!, quantity: pr.quantity!));
+            //           } else {
+            //             selectedProductsModel.mealsIds!.add(ProductSelection(
+            //                 id: pr.id!, quantity: pr.quantity!));
+            //           }
+            //         }
+            //       }
+            //       selectedProductsModel.studentId = widget.childId;
+            //       selectedProductsModel.dayId = widget.dayId;
+            //       BlocProvider.of<ProductsBloc>(context).add(
+            //           StoreDayBookedProductsEvent(
+            //               selectedProductsModel, widget.accessToken));
+            //     },
+            //     child: Text(
+            //       "PRODUCT_NAV_BOTTOM".tr(context),
+            //       style: TextStyle(fontSize: 15.sp, color: Colors.green),
+            //     ),
+            //   ),
+            // ),
+            body: Container(
+              width: 100.w,
+              height: 100.h,
+              decoration: BoxDecoration(
+                color: HexColor('#51093C'),
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.4),
+                    BlendMode.dstIn,
+                  ),
+                  image: const AssetImage(
+                    'assets/images/back3.png',
                   ),
                 ),
               ),
-              body: Container(
-                  decoration: const BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage('assets/images/bg.png'),
-                          fit: BoxFit.cover)),
-                  child: state.products.isEmpty
-                      ? const SizedBox()
-                      : ListView(children: [
-                          SizedBox(
-                            height: 2.h,
-                          ),
-                          Center(
-                            child: Card(
-                              color: Colors.white.withOpacity(0.7),
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30.0)),
-                              child: SizedBox(
-                                height: 5.h,
-                                width: 66.w,
-                                child: Center(
-                                    child: Text("PRODUCTS_LIST".tr(context),
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            color: textColor,
-                                            fontSize: 13.sp,
-                                            fontWeight: FontWeight.w700))),
-                              ),
-                            ),
-                          ),
-                          ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: state.products.length,
-                                itemBuilder: (context, index) {
-                                  return SizedBox(
-                                      height: 18.h,
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                           Padding(
-                                                padding: EdgeInsets.all(0.4.h),
-                                                child: ConstrainedBox(
-                                                    constraints: BoxConstraints(
-                                                      minWidth: 35.w,
-                                                      maxWidth: 35.w,
-                                                      maxHeight: 20.h,
-                                                      minHeight: 20.h,
-                                                    ),
-                                                    child: state.products[index]
-                                                                .image ==
-                                                            null
-                                                        ? Image.asset(
-                                                            'assets/launcher/logo.png',
-                                                            scale: 15.0,
-                                                          )
-                                                        : Container(
-                                                      decoration: BoxDecoration(
-                                                          color: Colors.white70,
-                                                          borderRadius:
-                                                          BorderRadius
-                                                              .circular(
-                                                              25.0),
-                                                          border: Border.all(
-                                                              color:
-                                                              primaryColor)),
-                                                      height: 12.h + 13.w,
-                                                      child: ClipRRect(
-                                                          borderRadius: BorderRadius.circular(25.0),
-                                                          child: Image(
-                                                            fit: BoxFit.cover,
-                                                            image: NetworkImage(Network().baseUrl + state.products[index].image!),
-                                                            width: 35.w,
-                                                          )),
-                                                    ))),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              SizedBox(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.37,
-                                                child: Padding(
-                                                  padding: EdgeInsets.fromLTRB(
-                                                      1.w, 1.h, 0, 0),
-                                                  child: AutoSizeText(
-                                                    state.products[index].name!,
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 13.sp,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.37,
-                                                height: 9.h,
-                                                child: Padding(
-                                                  padding: EdgeInsets.fromLTRB(
-                                                      1.w, 1.h, 0, 0),
-                                                  child: AutoSizeText(
-                                                    "${state.products[index]
-                                                            .description ??
-                                                        state.products[index]
-                                                            .name!}\n${DateFormat('dd/MM/yyyy').format(DateTime.parse(state.products[index].restaurantDatedProduct!.availableDate!))}",
-                                                    style: TextStyle(
-                                                      fontSize: 11.sp,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
+              child: CustomScrollView(
+                controller: _scrollController,
+                shrinkWrap: true,
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  SliverAppBar(
+                    expandedHeight: 22.2.h,
+                    pinned: true,
+                    centerTitle: true,
+                    scrolledUnderElevation: 10,
+                    backgroundColor: currentScroll < 16.h
+                        ? Colors.transparent
+                        : primaryColor,
+                    title: currentScroll > 16.h
+                        ? Text(
+                            'MEDRESE',
+                            style: FontManager.impact.copyWith(
+                                color: Colors.white, letterSpacing: 2),
+                          )
+                        : const SizedBox(),
+                    flexibleSpace: scrollviewAppbar(),
+                  ),
+                  SliverToBoxAdapter(
+                      child: state.products.isEmpty
+                          ? const SizedBox()
+                          : ListView(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              children: [
+                                  SizedBox(
+                                    height: 2.h,
+                                  ),
+                                  Container(
+                                    height: 6.h,
+                                    margin:
+                                        EdgeInsets.symmetric(horizontal: 2.w),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      boxShadow: [
+                                        new BoxShadow(
+                                          // spreadRadius: 0,
+                                          offset: Offset(0, 0),
+                                          color: Colors.white.withOpacity(.4),
+                                          blurRadius: 20.0,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Card(
+                                      margin:
+                                          EdgeInsets.symmetric(horizontal: 2.w),
+                                      color: Colors.white.withOpacity(0.7),
+                                      elevation: 5,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15.0),
+                                      ),
+                                      child: SizedBox(
+                                        height: 5.h,
+                                        width: 66.w,
+                                        child: Center(
+                                          child: Text(
+                                            "PRODUCTS_LIST".tr(context),
+                                            textAlign: TextAlign.center,
+                                            style: FontManager.kumbhSansBold
+                                                .copyWith(
+                                              color: Colors.white,
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                          Column(children: <Widget>[
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 2.h),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 1.w),
+                                    child: ListView.separated(
+                                        separatorBuilder: (context, index) =>
                                             Padding(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  0, 1.h, 0, 0),
-                                              child: Text(
-                                                toCurrencyString(
-                                                    state
-                                                        .products[index].price!,
-                                                    trailingSymbol:
-                                                        widget.currency,
-                                                    useSymbolPadding: true),
-                                                style: TextStyle(
-                                                    fontSize: 11.sp,
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                                padding: EdgeInsets.all(4.sp)),
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: state.products.length,
+                                        itemBuilder: (context, index) {
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(12)),
+                                              border: Border.all(
+                                                color: HexColor('#90579B'),
+                                                width: 2,
                                               ),
                                             ),
-                                            Padding(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  1.w, 2.h, 0, 0),
-                                              child: Container(
-                                                color: Colors.white,
-                                                height: 4.5.h,
-                                                width: 21.w,
-                                                child: state.products[index].isAvailableToBook==false?  ElevatedButton(onPressed: null, child: Text("DATED_BOOKED_NOT_AVAILABLE".tr(context))):Container(
-                                                  decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: primaryColor)),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      InkWell(
-                                                        onTap: () {
-                                                          if (state
-                                                                      .products[
-                                                                          index]
-                                                                      .quantity !=
-                                                                  null &&
-                                                              state
-                                                                      .products[
-                                                                          index]
-                                                                      .quantity! >
-                                                                  0) {
-                                                            setState(() {
-                                                              state
-                                                                  .products[
-                                                                      index]
-                                                                  .quantity = state
-                                                                      .products[
-                                                                          index]
-                                                                      .quantity! -
-                                                                  1;
-                                                            });
-                                                          }
-                                                        },
-                                                        child: const Icon(
-                                                            Icons.remove),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 1.w,
-                                                      ),
-                                                      Text(state.products[index]
-                                                          .quantity==null?'0':state.products[index]
-                                                          .quantity
-                                                          .toString()),
-                                                      SizedBox(
-                                                        width: 1.w,
-                                                      ),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          if (state
-                                                                      .products[
-                                                                          index]
-                                                                      .quantity ==
-                                                                  null ||
-                                                              state
-                                                                      .products[
-                                                                          index]
-                                                                      .quantity! <=
-                                                                  99) {
-                                                            setState(() {
-                                                              if (state
-                                                                      .products[
-                                                                          index]
-                                                                      .quantity ==
-                                                                  null) {
-                                                                state
-                                                                    .products[
-                                                                        index]
-                                                                    .quantity = 1;
-                                                              } else {
-                                                                state
-                                                                    .products[
-                                                                        index]
-                                                                    .quantity = state
-                                                                        .products[
-                                                                            index]
-                                                                        .quantity! +
-                                                                    1;
-                                                              }
-                                                            });
-                                                          }
-                                                        },
-                                                        child: const Icon(
-                                                            Icons.add),
-                                                      ),
-                                                    ],
-                                                  ),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(10)),
+                                                border: Border.all(
+                                                  color: HexColor('#EA4B6F'),
+                                                  width: 1.5,
                                                 ),
                                               ),
-                                            )
-                                          ]),
-                                        ],
-                                      ));
-                                }),
-                        ])));
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Container(
+                                                    margin: EdgeInsets.all(2.w),
+                                                    width: 35.w,
+                                                    height: 25.h,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              30),
+                                                      border: Border.all(
+                                                        color:
+                                                            HexColor('#C53E5D'),
+                                                        width: 3,
+                                                      ),
+                                                    ),
+                                                    child: CachedNetworkImage(
+                                                      // cacheManager: Base,
+                                                      fit: BoxFit.cover,
+                                                      imageUrl: Network()
+                                                              .baseUrl +
+                                                          state.products[index]
+                                                              .image!,
+                                                      imageBuilder: (context,
+                                                          imageProvider) {
+                                                        return Stack(
+                                                          alignment: Alignment
+                                                              .bottomCenter,
+                                                          children: [
+                                                            Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            28),
+                                                                image:
+                                                                    DecorationImage(
+                                                                  image:
+                                                                      imageProvider,
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Container(
+                                                              margin: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          .5.h),
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              width: 25.w,
+                                                              height: 5.6.h,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                boxShadow: [
+                                                                  new BoxShadow(
+                                                                    blurStyle:
+                                                                        BlurStyle
+                                                                            .outer,
+                                                                    // spreadRadius: 0,
+                                                                    offset:
+                                                                        Offset(
+                                                                            0,
+                                                                            0),
+
+                                                                    color: Colors
+                                                                        .black
+                                                                        .withOpacity(
+                                                                            1),
+                                                                    blurRadius:
+                                                                        15.0,
+                                                                  ),
+                                                                ],
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            30),
+                                                                color: Colors
+                                                                    .white
+                                                                    .withOpacity(
+                                                                        .57),
+                                                              ),
+                                                              child: Text(
+                                                                toCurrencyString(
+                                                                  '${state.products[index].price!}',
+                                                                  trailingSymbol:
+                                                                      widget
+                                                                          .currency,
+                                                                  useSymbolPadding:
+                                                                      true,
+                                                                ),
+                                                                style: FontManager
+                                                                    .kumbhSansBold
+                                                                    .copyWith(
+                                                                  fontSize:
+                                                                      12.sp,
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                      placeholder:
+                                                          (context, url) =>
+                                                              Center(
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.all(7),
+                                                          child: Stack(
+                                                            alignment: Alignment
+                                                                .center,
+                                                            children: [
+                                                              Image.asset(
+                                                                  'assets/launcher/logo.png'),
+                                                              CircularProgressIndicator(),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      errorWidget: (context,
+                                                          url, error) {
+                                                        return Container(
+                                                          // color: Colors.red,
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      5.w,
+                                                                  vertical:
+                                                                      1.h),
+                                                          child: Opacity(
+                                                            opacity: 1,
+                                                            child: Stack(
+                                                              alignment: Alignment
+                                                                  .bottomCenter,
+                                                              children: [
+                                                                Container(
+                                                                  margin: EdgeInsets
+                                                                      .only(
+                                                                          top: .4
+                                                                              .h),
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .center,
+                                                                  width: 25.w,
+                                                                  height: 5.6.h,
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    boxShadow: [
+                                                                      new BoxShadow(
+                                                                        blurStyle:
+                                                                            BlurStyle.outer,
+                                                                        // spreadRadius: 0,
+                                                                        offset: Offset(
+                                                                            0,
+                                                                            0),
+
+                                                                        color: Colors
+                                                                            .black
+                                                                            .withOpacity(1),
+                                                                        blurRadius:
+                                                                            15.0,
+                                                                      ),
+                                                                    ],
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            30),
+                                                                    color: Colors
+                                                                        .white
+                                                                        .withOpacity(
+                                                                            .57),
+                                                                  ),
+                                                                  child: Text(
+                                                                    toCurrencyString(
+                                                                        '${state.products[index].price!}',
+                                                                        trailingSymbol:
+                                                                            widget
+                                                                                .currency,
+                                                                        useSymbolPadding:
+                                                                            true),
+                                                                    style: FontManager
+                                                                        .kumbhSansBold
+                                                                        .copyWith(
+                                                                      fontSize:
+                                                                          12.sp,
+                                                                      color: Colors
+                                                                          .black,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                Opacity(
+                                                                  opacity: .6,
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: EdgeInsets
+                                                                        .only(
+                                                                            top:
+                                                                                2.h),
+                                                                    child:
+                                                                        Column(
+                                                                      children: [
+                                                                        Lottie.asset(
+                                                                            'assets/images/Desktop HD.json'),
+                                                                        Text(
+                                                                          'undefined image',
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                          style: FontManager
+                                                                              .dubaiRegular
+                                                                              .copyWith(
+                                                                            fontSize:
+                                                                                8.5.sp,
+                                                                            color:
+                                                                                Colors.white,
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 1.2.h),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: <Widget>[
+                                                        Container(
+                                                          width: 30.w,
+                                                          child: Padding(
+                                                            padding: EdgeInsets
+                                                                .fromLTRB(1.w,
+                                                                    1.h, 0, 0),
+                                                            child: AutoSizeText(
+                                                              '${state.products[index].name!}',
+                                                              style: FontManager
+                                                                  .kumbhSansBold
+                                                                  .copyWith(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 14.sp,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          width: 30.w,
+                                                          child: Padding(
+                                                            padding: EdgeInsets
+                                                                .fromLTRB(1.w,
+                                                                    1.h, 0, 0),
+                                                            child: AutoSizeText(
+                                                              "${state.products[index].description ?? state.products[index].name!}\n${state.products[index].restaurantDatedProduct?.availableDate != null ? DateFormat('dd/MM/yyyy').format(DateTime.parse(state.products[index].restaurantDatedProduct!.availableDate!)) : 'no date'}", //
+                                                              style: FontManager
+                                                                  .kumbhSansBold
+                                                                  .copyWith(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 12.sp,
+                                                                color: Colors
+                                                                    .white
+                                                                    .withOpacity(
+                                                                        .9),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 1.h),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        EdgeInsets.fromLTRB(
+                                                            1.w, 2.h, 0, 0),
+                                                    child: Card(
+                                                      elevation: 10,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(30),
+                                                      ),
+                                                      child: Container(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal:
+                                                                    2.w),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border.all(
+                                                            color: HexColor(
+                                                                '#924C89'),
+                                                            width: 2,
+                                                          ),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(30),
+                                                          color: HexColor(
+                                                              '#F7F4F4'),
+                                                        ),
+                                                        height: 6.h,
+                                                        width: 24.w,
+                                                        child: state
+                                                                    .products[
+                                                                        index]
+                                                                    .isAvailableToBook ==
+                                                                false
+                                                            ? ElevatedButton(
+                                                                onPressed: null,
+                                                                child: Text(
+                                                                    "DATED_BOOKED_NOT_AVAILABLE"
+                                                                        .tr(context)))
+                                                            : Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceAround,
+                                                                children: [
+                                                                  InkWell(
+                                                                      onTap:
+                                                                          () {
+                                                                        if (state.products[index].quantity !=
+                                                                                null &&
+                                                                            state.products[index].quantity! >
+                                                                                0) {
+                                                                          setState(
+                                                                              () {
+                                                                            state.products[index].quantity =
+                                                                                state.products[index].quantity! - 1;
+                                                                          });
+                                                                        }
+                                                                      },
+                                                                      child:
+                                                                          SizedBox(
+                                                                        width:
+                                                                            4.w,
+                                                                        height:
+                                                                            5.h,
+                                                                        child:
+                                                                            Divider(
+                                                                          color:
+                                                                              HexColor('#C53E5D'),
+                                                                          thickness:
+                                                                              5.2,
+                                                                        ),
+                                                                      )),
+                                                                  SizedBox(
+                                                                    width: 1.w,
+                                                                  ),
+                                                                  Text(
+                                                                    state.products[index].quantity ==
+                                                                            null
+                                                                        ? '0'
+                                                                        : state
+                                                                            .products[index]
+                                                                            .quantity
+                                                                            .toString(),
+                                                                    style: FontManager
+                                                                        .impact
+                                                                        .copyWith(
+                                                                      color: HexColor(
+                                                                          '#924C89'),
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: 1.w,
+                                                                  ),
+                                                                  InkWell(
+                                                                    onTap: () {
+                                                                      if (state.products[index].quantity ==
+                                                                              null ||
+                                                                          state.products[index].quantity! <=
+                                                                              99) {
+                                                                        setState(
+                                                                            () {
+                                                                          if (state.products[index].quantity ==
+                                                                              null) {
+                                                                            state.products[index].quantity =
+                                                                                1;
+                                                                          } else {
+                                                                            state.products[index].quantity =
+                                                                                state.products[index].quantity! + 1;
+                                                                          }
+                                                                        });
+                                                                      }
+                                                                    },
+                                                                    child:
+                                                                        SizedBox(
+                                                                      width:
+                                                                          4.w,
+                                                                      height:
+                                                                          5.h,
+                                                                      child:
+                                                                          ImageIcon(
+                                                                        AssetImage(
+                                                                          'assets/images/plus-symbol-button.png',
+                                                                        ),
+                                                                        size: 15
+                                                                            .sp,
+                                                                        color: HexColor(
+                                                                            '#70972C'),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        }),
+                                  ),
+                                ]))
+                ],
+              ),
+            ),
+          );
         }
       } else {
         return const SizedBox();

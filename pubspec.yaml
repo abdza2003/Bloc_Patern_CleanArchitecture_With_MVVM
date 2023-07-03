@@ -45,7 +45,17 @@ dependencies:
   device_preview:
   intl: ^0.17.0
   badges: ^3.0.3
-
+  shimmer: ^2.0.0
+  flutter_spinkit: ^5.2.0
+  loading_btn: ^1.0.3
+  cached_network_image: ^3.2.3
+  transparent_image: ^2.0.1
+  lottie: ^2.3.2
+  fade_shimmer: ^2.2.0
+  flutter_svg: ^0.23.0+1
+  proste_bezier_curve: ^2.0.2
+  hive: ^2.2.3
+  path_provider: ^2.0.15
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -63,6 +73,60 @@ flutter:
           weight: 400
         - asset: assets/fonts/helv/HELVETICANEUELTARABIC-BOLD.TTF
           weight: 500
+    - family: CHEWY
+      fonts:
+        - asset: assets/fonts/chewy/Chewy-Regular.TTF
+    - family: Amiri-Regular
+      fonts:
+        - asset: assets/fonts/Amiri-Regular.ttf
+    - family: Arial-Bold
+      fonts:
+        - asset: assets/fonts/Arial-Bold.ttf
+    - family: KumbhSans-Bold
+      fonts:
+        - asset: assets/fonts/KumbhSans-Bold.ttf
+    - family: KumbhSans-Regular
+      fonts:
+        - asset: assets/fonts/KumbhSans-Regular.ttf
+    - family: Montserrat-Medium
+      fonts:
+        - asset: assets/fonts/Montserrat-Medium.ttf
+    - family: Montserrat-Regular
+      fonts:
+        - asset: assets/fonts/Montserrat-Regular.ttf
+    - family: Montserrat-SemiBold
+      fonts:
+        - asset: assets/fonts/Montserrat-SemiBold.ttf
+    - family: Roboto-Medium
+      fonts:
+        - asset: assets/fonts/Roboto-Medium.ttf
+    - family: Roboto-Regular
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+    - family: Segoe-Regular
+      fonts:
+        - asset: assets/fonts/Segoe-Regular.ttf
+    - family: Montserrat-Bold
+      fonts:
+        - asset: assets/fonts/Montserrat-Bold.ttf
+    - family: Roboto-Bold
+      fonts:
+        - asset: assets/fonts/Roboto-Bold.ttf
+    - family: Dubai-Bold
+      fonts:
+        - asset: assets/fonts/Dubai-Bold.woff
+    - family: Dubai-Regular
+      fonts:
+        - asset: assets/fonts/Dubai-Regular.woff
+    - family: Poppins-Regular
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+    - family: Poppins-Bold
+      fonts:
+        - asset: assets/fonts/Poppins-Bold.ttf
+    - family: impact
+      fonts:
+        - asset: assets/fonts/impact.ttf
   uses-material-design: true
   assets:
     - assets/images/

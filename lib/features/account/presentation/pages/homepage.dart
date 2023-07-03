@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +8,8 @@ import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:school_cafteria/app_localizations.dart';
 import 'package:school_cafteria/core/app_theme.dart';
+import 'package:school_cafteria/core/constants/font_manager.dart';
+import 'package:school_cafteria/core/util/hex_color.dart';
 import 'package:school_cafteria/features/account/presentation/pages/Account/loginpage.dart';
 import 'package:school_cafteria/features/products/presentation/bloc/products_bloc.dart'
     as pb;
@@ -22,6 +26,8 @@ import '../../../products/presentation/pages/day_products/products_search_by_pri
 import '../../../products/presentation/pages/day_products/school_days_xd.dart';
 import '../../domain/entities/user.dart';
 import '../bloc/account/account_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:lottie/lottie.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key, required this.user}) : super(key: key);
@@ -36,6 +42,7 @@ class HomePage extends StatefulWidget {
 }
 
 class MyPageState extends State<HomePage> {
+  // static final customCacheaManager = Config
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
@@ -76,6 +83,7 @@ class MyPageState extends State<HomePage> {
               } else if (state is LoggedInState) {
                 setState(() {
                   widget.user = state.user;
+                  print('=============sucess============');
                 });
               }
             },
@@ -87,15 +95,17 @@ class MyPageState extends State<HomePage> {
             for (var school in widget.user.schools!) {
               accessTokens.add(school.accessToken!);
             }
+            setState(() {});
             BlocProvider.of<AccountBloc>(context)
                 .add(RefreshEvent(accessTokens));
 
             return Future.value();
           },
           child: ListView.builder(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
               itemCount: widget.user.childern!.length,
-              itemBuilder: (context, index) {
-                //set variables to fit in TextForm
+              itemBuilder: (_, index) {
                 final name = TextEditingController();
                 final schoolName = TextEditingController();
 
@@ -110,7 +120,7 @@ class MyPageState extends State<HomePage> {
                     useSymbolPadding: true);
 
                 return SizedBox(
-                    height: 20.h + 26.w,
+                    height: 22.h + 26.w,
                     child: Container(
                         decoration: BoxDecoration(boxShadow: [
                           BoxShadow(
@@ -119,186 +129,313 @@ class MyPageState extends State<HomePage> {
                           )
                         ]),
                         child: ClipRect(
+                            clipBehavior: Clip.antiAliasWithSaveLayer,
                             child: Banner(
-                          message: widget.user.childern![index].isActive == "1"
-                              ? "CHILD_ACTIVE".tr(context)
-                              : "CHILD_NOT_ACTIVE".tr(context),
-                          location: BannerLocation.topStart,
-                          color: widget.user.childern![index].isActive == "1"
-                              ? Colors.green
-                              : Colors.redAccent,
-                          child: Card(
-                            color: Colors.transparent,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(
-                                    width: 5, color: oldPrimaryColor),
-                                borderRadius: BorderRadius.circular(30.0)),
-                            child: Card(
-                              color: Colors.white.withOpacity(0.5),
-                              shape: RoundedRectangleBorder(
-                                  side: const BorderSide(
-                                      width: 3, color: secondaryColor2),
-                                  borderRadius: BorderRadius.circular(25.0)),
-                              elevation: 0,
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: 5.h,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Text(name.text,
-                                            style: TextStyle(
-                                                color: textColor,
-                                                fontSize: 13.sp,
-                                                fontWeight: FontWeight.w700)),
-                                        Text(
-                                          toCurrencyString(balance.text,
-                                              useSymbolPadding: true,
-                                              trailingSymbol: widget
-                                                  .user
-                                                  .childern![index]
-                                                  .school!
-                                                  .currencyName!),
-                                          style: TextStyle(
-                                              color: textColor,
-                                              fontSize: 13.sp,
-                                              fontWeight: FontWeight.w700),
-                                        )
-                                      ],
+                              message:
+                                  widget.user.childern![index].isActive == 1
+                                      ? "CHILD_ACTIVE".tr(context)
+                                      : "CHILD_NOT_ACTIVE".tr(context),
+                              location: BannerLocation.topStart,
+                              color: widget.user.childern![index].isActive == 1
+                                  ? Colors.green
+                                  : Colors.redAccent,
+                              child: Card(
+                                color: HexColor('#23284E').withOpacity(.45),
+                                // elevation: 10,
+                                shape: RoundedRectangleBorder(
+                                    side: const BorderSide(
+                                      width: 5,
+                                      color: oldPrimaryColor,
                                     ),
-                                  ),
-                                  const DottedLine(dashColor: secondaryColor2),
-                                  SizedBox(
-                                    width: 100.w,
-                                    height: 24.h,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SizedBox(
-                                          width: 37.w,
-                                          height: 21.h,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              widget.user.childern![index]
-                                                          .image ==
-                                                      null
-                                                  ? Image.asset(
-                                                      'assets/launcher/logo.png',
-                                                      width: 30.w,
-                                                      fit: BoxFit.fitHeight,
-                                                    )
-                                                  : Container(
-                                                      decoration: BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      25.0),
-                                                          border: Border.all(
+                                    borderRadius: BorderRadius.circular(30.0)),
+                                child: Card(
+                                  // color: Colors.white.withOpacity(0.5),
+                                  color: HexColor('#23284E').withOpacity(.45),
+                                  shape: RoundedRectangleBorder(
+                                      side: const BorderSide(
+                                          width: 3, color: secondaryColor2),
+                                      borderRadius:
+                                          BorderRadius.circular(25.0)),
+                                  elevation: 0,
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(
+                                          left: 6.w,
+                                          right: 6.w,
+                                          top: 2.h,
+                                          bottom: 1.h,
+                                        ),
+                                        // color: Colors.red,
+                                        // height: 7.h,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              name.text,
+                                              style: FontManager.dubaiBold
+                                                  .copyWith(
+                                                color: Colors.white,
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              toCurrencyString(balance.text,
+                                                  useSymbolPadding: true,
+                                                  trailingSymbol: widget
+                                                      .user
+                                                      .childern![index]
+                                                      .school!
+                                                      .currencyName!),
+                                              style: FontManager.dubaiRegular
+                                                  .copyWith(
+                                                color: Colors.white,
+                                                fontSize: 13.sp,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 4.w),
+                                        child: const DottedLine(
+                                          lineThickness: 3,
+                                          dashColor: secondaryColor2,
+                                        ),
+                                      ),
+                                      Container(
+                                        // color: Colors.red,
+                                        width: 100.w,
+                                        height: 24.h,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.all(
+                                                  AppLocalizations.of(context)!
+                                                              .locale!
+                                                              .languageCode !=
+                                                          'ar'
+                                                      ? 2.w
+                                                      : 1.w), //!
+                                              width: 32.w,
+                                              height: 20.h,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
+                                                border: Border.all(
+                                                  color: HexColor('#8E579C'),
+                                                  width: 3,
+                                                ),
+                                              ),
+                                              child: CachedNetworkImage(
+                                                // cacheManager: Base,
+                                                fit: BoxFit.cover,
+                                                imageUrl: 'http://medrese.uk' +
+                                                    widget.user.childern![index]
+                                                        .image,
+                                                imageBuilder:
+                                                    (context, imageProvider) {
+                                                  return Container(
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              26),
+                                                      image: DecorationImage(
+                                                        image: imageProvider,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                placeholder: (context, url) =>
+                                                    Center(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.all(7),
+                                                    child: Stack(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      children: [
+                                                        Image.asset(
+                                                            'assets/launcher/logo.png'),
+                                                        CircularProgressIndicator(),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                errorWidget:
+                                                    (context, url, error) {
+                                                  return Container(
+                                                    padding:
+                                                        EdgeInsets.all(5.w),
+                                                    child: Opacity(
+                                                      opacity: .6,
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Lottie.asset(
+                                                              'assets/images/Desktop HD.json'),
+                                                          Text(
+                                                            'undefined image',
+                                                            style: FontManager
+                                                                .dubaiRegular
+                                                                .copyWith(
+                                                              fontSize: 8.5.sp,
                                                               color:
-                                                                  primaryColor)),
-                                                      height: 12.h + 13.w,
-                                                      child: ClipRRect(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      25.0),
-                                                          child: Image(
-                                                            fit: BoxFit.cover,
-                                                            image: NetworkImage(
-                                                                Network()
-                                                                        .baseUrl +
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                  height: 3.h,
+                                                ),
+                                                Container(
+                                                    // color: Colors.red,
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 0),
+                                                    width: 48.w,
+                                                    height: 3.h,
+                                                    child: TextField(
+                                                      style: FontManager
+                                                          .dubaiBold
+                                                          .copyWith(
+                                                        color: Colors.white,
+                                                        fontSize: 13.sp,
+                                                      ),
+                                                      decoration:
+                                                          const InputDecoration(
+                                                        border:
+                                                            InputBorder.none,
+                                                      ),
+                                                      readOnly: true,
+                                                      controller:
+                                                          TextEditingController(
+                                                              text: schoolName
+                                                                  .text
+                                                                  .toUpperCase()),
+                                                    )),
+                                                Row(
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                        top: 5,
+                                                        right: 5,
+                                                      ),
+                                                      child: ElevatedButton(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          padding:
+                                                              EdgeInsets.all(0),
+                                                          backgroundColor:
+                                                              HexColor(
+                                                                      '#662483')
+                                                                  .withOpacity(
+                                                                      .68),
+                                                          fixedSize:
+                                                              Size(27.w, 6.h),
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10.0),
+                                                          ),
+                                                        ),
+                                                        onPressed: widget
+                                                                    .user
+                                                                    .childern![
+                                                                        index]
+                                                                    .isActive ==
+                                                                "0"
+                                                            ? null
+                                                            : () {
+                                                                selectStudentSpendingType(
+                                                                    context,
                                                                     widget
                                                                         .user
                                                                         .childern![
                                                                             index]
-                                                                        .image!),
-                                                            width: 35.w,
-                                                          )),
+                                                                        .name!,
+                                                                    widget
+                                                                        .user
+                                                                        .childern![
+                                                                            index]
+                                                                        .id!,
+                                                                    widget
+                                                                        .user
+                                                                        .childern![
+                                                                            index]
+                                                                        .accessTokenParent!,
+                                                                    widget
+                                                                        .user
+                                                                        .childern![
+                                                                            index]
+                                                                        .school!
+                                                                        .currencyName!);
+                                                              },
+                                                        child: Text(
+                                                          "HOME_PAGE_BUTTON1"
+                                                              .tr(context),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: FontManager
+                                                              .dubaiBold
+                                                              .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors.white,
+                                                            fontSize: 10.sp,
+                                                          ),
+                                                        ),
+                                                      ), // <-- Text
                                                     ),
-                                            ],
-                                          ),
-                                        ),
-                                        Column(
-                                          children: [
-                                            SizedBox(
-                                              height: 3.h,
-                                            ),
-                                            SizedBox(
-                                                width: 55.w,
-                                                height: 3.h,
-                                                child: TextField(
-                                                  style: TextStyle(
-                                                      color: textColor,
-                                                      fontSize: 13.sp,
-                                                      fontWeight:
-                                                          FontWeight.w700),
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border: InputBorder.none,
-                                                  ),
-                                                  readOnly: true,
-                                                  controller: schoolName,
-                                                )),
-                                            Row(
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(3.0),
-                                                  child: ElevatedButton(
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      fixedSize:
-                                                          Size(27.w, 6.h),
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          15.0)),
-                                                    ),
-                                                    onPressed: widget.user.childern![index].isActive == "0" ? null : () {
-
-                                                            selectStudentSpendingType(context, widget
-                                                                    .user
-                                                                    .childern![index].name!,
-                                                                widget.user.childern![index].id!,
-                                                                widget.user.childern![index].accessTokenParent!,
-                                                                widget.user.childern![index].school!.currencyName!);
-                                                          },
-                                                    child: Text(
-                                                      "HOME_PAGE_BUTTON1"
-                                                          .tr(context),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                        fontSize: 8.5.sp,
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                        top: 5,
+                                                        right: 5,
                                                       ),
-                                                    ),
-                                                  ), // <-- Text
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(3.0),
-                                                  child: ElevatedButton(
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      fixedSize:
-                                                          Size(27.w, 6.h),
-                                                      shape:
-                                                          RoundedRectangleBorder(
+                                                      child: ElevatedButton(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          backgroundColor:
+                                                              HexColor(
+                                                                      '#662483')
+                                                                  .withOpacity(
+                                                                      .68),
+                                                          fixedSize:
+                                                              Size(27.w, 6.h),
+                                                          shape: RoundedRectangleBorder(
                                                               borderRadius:
                                                                   BorderRadius
                                                                       .circular(
-                                                                          15.0)),
-                                                    ),
-                                                    onPressed:
-                                                        widget.user.childern![index].isActive == "0" ? null
+                                                                          10.0)),
+                                                        ),
+                                                        onPressed: widget
+                                                                    .user
+                                                                    .childern![
+                                                                        index]
+                                                                    .isActive ==
+                                                                "0"
+                                                            ? null
                                                             : () {
                                                                 BlocProvider.of<
                                                                             pb.ProductsBloc>(
@@ -332,37 +469,50 @@ class MyPageState extends State<HomePage> {
                                                                             .school!
                                                                             .currencyName!));
                                                               },
-                                                    child: Text(
-                                                      "HOME_PAGE_BUTTON2"
-                                                          .tr(context),
-                                                      style: TextStyle(
-                                                          fontSize: 8.5.sp),
-                                                    ), // <-- Text
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(3.0),
-                                                  child: ElevatedButton(
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      fixedSize:
-                                                          Size(27.w, 6.h),
-                                                      shape:
-                                                          RoundedRectangleBorder(
+                                                        child: Text(
+                                                          "HOME_PAGE_BUTTON2"
+                                                              .tr(context),
+                                                          style: FontManager
+                                                              .dubaiBold
+                                                              .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors.white,
+                                                            fontSize: 10.sp,
+                                                          ),
+                                                        ), // <-- Text
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                        top: 5,
+                                                        right: 5,
+                                                      ),
+                                                      child: ElevatedButton(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          backgroundColor:
+                                                              HexColor(
+                                                                      '#662483')
+                                                                  .withOpacity(
+                                                                      .68),
+                                                          fixedSize:
+                                                              Size(27.w, 6.h),
+                                                          shape: RoundedRectangleBorder(
                                                               borderRadius:
                                                                   BorderRadius
                                                                       .circular(
-                                                                          15.0)),
-                                                    ),
-                                                    onPressed:
-                                                        widget
+                                                                          10.0)),
+                                                        ),
+                                                        onPressed: widget
                                                                     .user
                                                                     .childern![
                                                                         index]
@@ -412,77 +562,96 @@ class MyPageState extends State<HomePage> {
                                                                     ));
                                                               },
 
-                                                    child: Text(
-                                                      "HOME_PAGE_BUTTON3"
-                                                          .tr(context),
-                                                      style: TextStyle(
-                                                          fontSize: 8.5.sp),
-                                                    ), // <-- Text
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(3.0),
-                                                  child: ElevatedButton(
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      fixedSize:
-                                                          Size(27.w, 6.h),
-                                                      shape:
-                                                          RoundedRectangleBorder(
+                                                        child: Text(
+                                                          "HOME_PAGE_BUTTON3"
+                                                              .tr(context),
+                                                          style: FontManager
+                                                              .dubaiBold
+                                                              .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors.white,
+                                                            fontSize: 10.sp,
+                                                          ),
+                                                        ), // <-- Text
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                        top: 5,
+                                                        right: 5,
+                                                      ),
+                                                      child: ElevatedButton(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          backgroundColor:
+                                                              HexColor(
+                                                                      '#662483')
+                                                                  .withOpacity(
+                                                                      .68),
+                                                          fixedSize:
+                                                              Size(27.w, 6.h),
+                                                          shape: RoundedRectangleBorder(
                                                               borderRadius:
                                                                   BorderRadius
                                                                       .circular(
-                                                                          15.0)),
-                                                    ),
-                                                    onPressed: widget
-                                                                .user
-                                                                .childern![
-                                                                    index]
-                                                                .isActive ==
-                                                            "0"
-                                                        ? null
-                                                        : () {
-                                                            selectPaymentMethod(
-                                                                context,
-                                                                widget
+                                                                          10.0)),
+                                                        ),
+                                                        onPressed: widget
                                                                     .user
                                                                     .childern![
                                                                         index]
-                                                                    .name!,
-                                                                widget
-                                                                    .user
-                                                                    .childern![
-                                                                        index]
-                                                                    .id!,
-                                                                widget
-                                                                    .user
-                                                                    .childern![
-                                                                        index]
-                                                                    .accessTokenParent!);
-                                                          },
+                                                                    .isActive ==
+                                                                "0"
+                                                            ? null
+                                                            : () {
+                                                                selectPaymentMethod(
+                                                                    context,
+                                                                    widget
+                                                                        .user
+                                                                        .childern![
+                                                                            index]
+                                                                        .name!,
+                                                                    widget
+                                                                        .user
+                                                                        .childern![
+                                                                            index]
+                                                                        .id!,
+                                                                    widget
+                                                                        .user
+                                                                        .childern![
+                                                                            index]
+                                                                        .accessTokenParent!);
+                                                              },
 
-                                                    child: Text(
-                                                      "HOME_PAGE_BUTTON4"
-                                                          .tr(context),
-                                                      style: TextStyle(
-                                                          fontSize: 8.5.sp),
-                                                    ), // <-- Text
-                                                  ),
+                                                        child: Text(
+                                                          "HOME_PAGE_BUTTON4"
+                                                              .tr(context),
+                                                          style: FontManager
+                                                              .dubaiBold
+                                                              .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors.white,
+                                                            fontSize: 10.sp,
+                                                          ),
+                                                        ), // <-- Text
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),
                                           ],
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                  //
+                                ),
                               ),
-                              //
-                            ),
-                          ),
-                        ))));
+                            ))));
               }),
         ));
   }
@@ -493,10 +662,18 @@ class MyPageState extends State<HomePage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              backgroundColor: HexColor('#8D6996'),
               titlePadding: EdgeInsets.zero,
               title: SizedBox(
                 height: 8.h,
                 child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  margin: EdgeInsets.zero,
                   color: primaryColor,
                   elevation: 5,
                   child: Center(
@@ -513,8 +690,11 @@ class MyPageState extends State<HomePage> {
                 children: [
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          fixedSize: Size(60.w, 6.7.h),
                           elevation: 5,
-                          fixedSize: Size(60.w, 8.h),
                           backgroundColor: Colors.white,
                           side: const BorderSide(color: primaryColor)),
                       onPressed: () {
@@ -523,21 +703,27 @@ class MyPageState extends State<HomePage> {
                             context, childName, childId, accessToken);
                       },
                       child: Text("PAYMENT_METHOD_1".tr(context),
-                          style:
-                              TextStyle(fontSize: 17.sp, color: primaryColor))),
+                          style: FontManager.kumbhSansBold.copyWith(
+                              fontSize: 17.sp, color: HexColor('#777575')))),
                   SizedBox(
                     height: 4.h,
                   ),
                   ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          elevation: 5,
-                          fixedSize: Size(60.w, 8.h),
-                          backgroundColor: Colors.white,
-                          side: const BorderSide(color: primaryColor)),
-                      onPressed: null,
-                      child: Text("PAYMENT_METHOD_2".tr(context),
-                          style:
-                              TextStyle(fontSize: 17.sp, color: primaryColor))),
+                    style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        elevation: 5,
+                        fixedSize: Size(60.w, 6.7.h),
+                        backgroundColor: Colors.white,
+                        side: const BorderSide(color: primaryColor)),
+                    onPressed: () {},
+                    child: Text(
+                      "PAYMENT_METHOD_2".tr(context),
+                      style: TextStyle(
+                          fontSize: 17.sp, color: HexColor('#777575')),
+                    ),
+                  ),
                 ],
               ));
         });
@@ -550,8 +736,11 @@ class MyPageState extends State<HomePage> {
         builder: (_) => StatefulBuilder(
                 builder: (BuildContext context, StateSetter setState) {
               return AlertDialog(
-                backgroundColor: Colors.white,
-                contentPadding: EdgeInsets.zero,
+                backgroundColor: HexColor('#8D6996'),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                contentPadding: EdgeInsets.all(4.h),
                 actionsAlignment: MainAxisAlignment.center,
                 actions: <Widget>[
                   ElevatedButton(
@@ -560,22 +749,27 @@ class MyPageState extends State<HomePage> {
                         backgroundColor: Colors.white,
                         elevation: 10,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0)),
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
                       ),
                       child: Text("HOME_PAGE_SET_PAYMENT".tr(context),
-                          style:
-                              TextStyle(fontSize: 14.sp, color: Colors.green)),
+                          style: FontManager.kumbhSansBold
+                              .copyWith(fontSize: 14.sp, color: Colors.green)),
                       onPressed: () async {
                         if (widget.formKey.currentState!.validate()) {
                           confirmationDialog(context, () {
                             Go.back(context);
                             BlocProvider.of<bb.BalanceBloc>(context).add(
-                                bb.AddBalanceEvent(
-                                    double.parse(widget.balance.text),
-                                    childId,
-                                    accessToken));
+                              bb.AddBalanceEvent(
+                                double.parse(widget.balance.text),
+                                childId,
+                                accessToken,
+                              ),
+                            );
                           },
-                              "ADD_CREDIT_CONFIRMATION".tr(context) +
+                              "ADD_CREDIT_CONFIRMATION"
+                                      .tr(context)
+                                      .toUpperCase() +
                                   widget.balance.text);
                         }
                       }),
@@ -588,34 +782,41 @@ class MyPageState extends State<HomePage> {
                             borderRadius: BorderRadius.circular(30.0)),
                       ),
                       onPressed: () => Navigator.pop(context),
-                      child: Text("DIALOG_BUTTON_CANCEL".tr(context),
-                          style: TextStyle(fontSize: 14.sp, color: Colors.red)))
+                      child: Text(
+                          "DIALOG_BUTTON_CANCEL".tr(context).toUpperCase(),
+                          style: FontManager.kumbhSansBold
+                              .copyWith(fontSize: 14.sp, color: Colors.red)))
                 ],
                 titlePadding: EdgeInsets.zero,
                 title: SizedBox(
                     height: 8.h,
                     child: Card(
+                        margin: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
                         color: primaryColor,
                         elevation: 10,
                         child: Center(
                             child: Text(
                           "SET_PAYMENTS_TITLE".tr(context),
-                          style: TextStyle(
-                              fontSize: 11.sp,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600),
+                          style: FontManager.kumbhSansBold.copyWith(
+                            fontSize: 12.sp,
+                            color: Colors.white,
+                          ),
                           textAlign: TextAlign.center,
                         )))),
                 content: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: Column(
                     children: [
+                      SizedBox(height: 2.h),
                       Text(
                         "SET_PAYMENT_BODY".tr(context) + childName,
-                        style: TextStyle(
-                            fontSize: 11.sp,
-                            color: textColor,
-                            fontWeight: FontWeight.w600),
+                        style: FontManager.kumbhSansBold.copyWith(
+                            fontSize: 10.sp,
+                            color: Colors.white,
+                            fontWeight: FontWeight.normal),
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(
@@ -629,6 +830,7 @@ class MyPageState extends State<HomePage> {
                             SizedBox(
                               width: 40.w,
                               child: Card(
+                                color: HexColor('#F7F4F4'),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30.0)),
                                 child: Padding(
@@ -645,16 +847,18 @@ class MyPageState extends State<HomePage> {
                                         : null,
                                     controller: widget.balance,
                                     decoration: InputDecoration(
-                                      focusedBorder: const UnderlineInputBorder(
-                                        borderSide:
-                                            BorderSide(color: primaryColor),
+                                      // filled: true,
+                                      // fillColor: HexColor('#F7F4F4'),
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: HexColor('#8D6996')),
                                       ),
                                       border: const UnderlineInputBorder(
                                         borderSide:
                                             BorderSide(color: primaryColor),
                                       ),
-                                      hintStyle:
-                                          const TextStyle(color: textColor),
+                                      hintStyle: FontManager.kumbhSansBold
+                                          .copyWith(color: textColor),
                                       hintText: 'DIALOG_SEARCH_PRICE_TEXT_HINT'
                                           .tr(context),
                                     ),
@@ -770,15 +974,27 @@ class MyPageState extends State<HomePage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              backgroundColor: HexColor('#8D6996'),
               titlePadding: EdgeInsets.zero,
               title: SizedBox(
                 height: 8.h,
                 child: Card(
-                  color: Colors.white,
-                  elevation: 10,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  color: HexColor('#8D6996'),
+                  margin: EdgeInsets.zero,
+                  elevation: 20,
                   child: Center(
                     child: Text(
                       "SET_SPENDING_TYPE".tr(context),
+                      style: FontManager.kumbhSansBold.copyWith(
+                        fontSize: 12.sp,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -788,34 +1004,49 @@ class MyPageState extends State<HomePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          elevation: 5,
-                          fixedSize: Size(60.w, 8.h),
-                          backgroundColor: sc2,
-                          side: const BorderSide(color: textColor)),
-                      onPressed: () {
-                        Go.back(context);
-                        BlocProvider.of<pb.ProductsBloc>(context)
-                            .add(pb.GetSchoolDaysEvent(childId, accessToken));
-                        Go.to(
-                            context,
-                            SchoolDays2(
-                              accessToken: accessToken,
-                              childId: childId,
-                              currency: currency,
-                              childName: childName,
-                            ));
-                      },
-                      child: Text("SPENDING_TYPE1".tr(context),
-                          style: TextStyle(fontSize: 17.sp, color: textColor))),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      elevation: 5,
+                      fixedSize: Size(60.w, 6.5.h),
+                      side: const BorderSide(
+                        color: textColor,
+                      ),
+                    ),
+                    onPressed: () {
+                      Go.back(context);
+                      BlocProvider.of<pb.ProductsBloc>(context)
+                          .add(pb.GetSchoolDaysEvent(childId, accessToken));
+                      Go.to(
+                          context,
+                          SchoolDays2(
+                            accessToken: accessToken,
+                            childId: childId,
+                            currency: currency,
+                            childName: childName,
+                          ));
+                    },
+                    child: Text(
+                      "SPENDING_TYPE1".tr(context),
+                      style: FontManager.kumbhSansBold.copyWith(
+                        fontSize: 17.sp,
+                        color: HexColor('#777575'),
+                      ),
+                    ),
+                  ),
                   SizedBox(
                     height: 4.h,
                   ),
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                           elevation: 5,
-                          fixedSize: Size(60.w, 8.h),
-                          backgroundColor: sc2,
+                          fixedSize: Size(60.w, 6.5.h),
+                          backgroundColor: Colors.white,
                           side: const BorderSide(color: textColor)),
                       onPressed: () {
                         BlocProvider.of<pb.ProductsBloc>(context).add(
@@ -836,8 +1067,13 @@ class MyPageState extends State<HomePage> {
                               childName: childName,
                             ));
                       },
-                      child: Text("SPENDING_TYPE2".tr(context),
-                          style: TextStyle(fontSize: 17.sp, color: textColor))),
+                      child: Text(
+                        "SPENDING_TYPE2".tr(context),
+                        style: FontManager.kumbhSansBold.copyWith(
+                          fontSize: 17.sp,
+                          color: HexColor('#777575'),
+                        ),
+                      )),
                 ],
               ));
         });

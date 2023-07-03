@@ -3,22 +3,22 @@ import 'package:school_cafteria/features/account/data/models/school_model.dart';
 import 'package:school_cafteria/features/account/domain/entities/school.dart';
 
 class Child extends Equatable {
-  int? id;
-  String? name;
-  String? userName;
-  String? email;
-  String? image;
-  String? mobile;
-  String? isActive;
-  String? schoolId;
-  String? supervisorId;
-  String? createdAt;
-  String? updatedAt;
-  String? parentId;
-  String? uuid;
+  var id;
+  var name;
+  var userName;
+  var email;
+  var image;
+  var mobile;
+  var isActive;
+  var schoolId;
+  var supervisorId;
+  var createdAt;
+  var updatedAt;
+  var parentId;
+  var uuid;
   dynamic balance;
   dynamic weeklyBalance;
-  String? accessTokenParent;
+  var accessTokenParent;
   SchoolModel? school;
 
   Child(
@@ -38,8 +38,7 @@ class Child extends Equatable {
       this.balance,
       this.school,
       this.accessTokenParent,
-        this.weeklyBalance
-      });
+      this.weeklyBalance});
 
   @override
   // TODO: implement props
