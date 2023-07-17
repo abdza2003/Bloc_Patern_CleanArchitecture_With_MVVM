@@ -3,6 +3,7 @@ class Product {
   var name;
   var barcode;
   var image;
+  var date;
   var description;
   var price;
   var modelType;
@@ -10,6 +11,7 @@ class Product {
   var createdAt;
   var updatedAt;
   var showOnMobile;
+  var productId;
   dynamic quantity;
   bool selected = false;
   var isMarket = "true";
@@ -18,6 +20,8 @@ class Product {
 
   Product(
       {this.id,
+      this.productId,
+      this.date,
       this.name,
       this.barcode,
       this.image,

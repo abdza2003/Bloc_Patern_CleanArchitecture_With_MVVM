@@ -1,9 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_multi_formatter/formatters/formatter_utils.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:school_cafteria/appBar.dart';
 import 'package:school_cafteria/app_localizations.dart';
 import 'package:school_cafteria/core/constants/font_manager.dart';
@@ -12,6 +14,7 @@ import 'package:school_cafteria/core/widgets/loading_widget.dart';
 import 'package:school_cafteria/features/products/presentation/bloc/products_bloc.dart';
 import 'package:school_cafteria/features/products/presentation/pages/booked_products/school_dated_product_page.dart';
 import 'package:school_cafteria/features/products/presentation/pages/day_products/products_search_by_price.dart';
+import 'package:school_cafteria/scrollviewAppbar.dart';
 import 'package:school_cafteria/test/app_bar_widget.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../../core/app_theme.dart';
@@ -20,7 +23,7 @@ import '../../../../../core/network/api.dart';
 import '../../../../../core/util/snackbar_message.dart';
 import '../../../../../core/widgets/confirmation_dialog.dart';
 
-class BookedDayProducts extends StatelessWidget {
+class BookedDayProducts extends StatefulWidget {
   BookedDayProducts(
       {Key? key,
       required this.accessToken,
@@ -36,7 +39,41 @@ class BookedDayProducts extends StatelessWidget {
   final int dayId;
   final String currency;
   final String dayName;
+
+  @override
+  State<BookedDayProducts> createState() => _BookedDayProductsState();
+}
+
+class _BookedDayProductsState extends State<BookedDayProducts> {
+  final _scrollController = ScrollController();
+
+  double maxScroll = 0;
+
+  double currentScroll = 0;
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    maxScroll = _scrollController.position.maxScrollExtent;
+    currentScroll = _scrollController.offset;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
   final maxPrice = TextEditingController();
+
   final formKey = GlobalKey<FormState>();
 
   @override
@@ -49,16 +86,16 @@ class BookedDayProducts extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             BlocProvider.of<ProductsBloc>(context)
-                .add(GetDatedProductsEvent(accessToken, dayId));
+                .add(GetDatedProductsEvent(widget.accessToken, widget.dayId));
             Go.to(
                 context,
                 SchoolDatedProduct(
-                    accessToken: accessToken,
-                    childId: childId,
-                    currency: currency,
-                    dayId: dayId,
-                    dayName: dayName,
-                    childName: childName));
+                    accessToken: widget.accessToken,
+                    childId: widget.childId,
+                    currency: widget.currency,
+                    dayId: widget.dayId,
+                    dayName: widget.dayName,
+                    childName: widget.childName));
           },
           child: const Icon(Icons.add),
         ),
@@ -70,8 +107,8 @@ class BookedDayProducts extends StatelessWidget {
           } else if (state is SuccessMsgState) {
             SnackBarMessage()
                 .showSuccessSnackBar(message: state.message, context: context);
-            BlocProvider.of<ProductsBloc>(context)
-                .add(GetBookedProductsEvent(childId, accessToken, dayId));
+            BlocProvider.of<ProductsBloc>(context).add(GetBookedProductsEvent(
+                widget.childId, widget.accessToken, widget.dayId));
           }
         }, buildWhen: (productsBloc, productsState) {
           if (productsState is LoadedBookedProductsState) {
@@ -85,7 +122,27 @@ class BookedDayProducts extends StatelessWidget {
         ) {
           if (state is LoadingState) {
             return Scaffold(
+                backgroundColor: Colors.transparent,
                 body: Container(
+                  decoration: BoxDecoration(
+                    color: HexColor('#51093C'),
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      colorFilter: ColorFilter.mode(
+                        Colors.black.withOpacity(0.4),
+                        BlendMode.dstIn,
+                      ),
+                      image: const AssetImage(
+                        'assets/images/back3.png',
+                      ),
+                    ),
+                  ),
+                  child: const LoadingWidget(),
+                ));
+          } else if (state is LoadedBookedProductsState) {
+            return Container(
+              width: 100.w,
+              height: 100.h,
               decoration: BoxDecoration(
                 color: HexColor('#51093C'),
                 image: DecorationImage(
@@ -99,225 +156,431 @@ class BookedDayProducts extends StatelessWidget {
                   ),
                 ),
               ),
-              child: const LoadingWidget(),
-            ));
-          } else if (state is LoadedBookedProductsState) {
-            return Stack(
-              children: [
-                Container(
-                    padding: EdgeInsets.only(top: 20.h),
-                    decoration: BoxDecoration(
-                      color: HexColor('#51093C'),
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        colorFilter: ColorFilter.mode(
-                          Colors.black.withOpacity(0.4),
-                          BlendMode.dstIn,
-                        ),
-                        image: const AssetImage(
-                          'assets/images/back3.png',
-                        ),
-                      ),
-                    ),
-                    child: ListView(children: [
-                      SizedBox(
-                        height: 2.h,
-                      ),
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 2.w),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            new BoxShadow(
-                              // spreadRadius: 0,
-                              offset: Offset(0, 0),
-                              color: Colors.white.withOpacity(.4),
-                              blurRadius: 20.0,
-                            ),
-                          ],
-                        ),
-                        child: Card(
-                          margin: EdgeInsets.symmetric(horizontal: 2.w),
-                          color: Colors.white.withOpacity(0.7),
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.0),
+              child: CustomScrollView(
+                controller: _scrollController,
+                shrinkWrap: true,
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  SliverAppBar(
+                    expandedHeight: 22.2.h,
+                    pinned: true,
+                    centerTitle: true,
+                    scrolledUnderElevation: 10,
+                    backgroundColor: currentScroll < 16.h
+                        ? Colors.transparent
+                        : primaryColor,
+                    title: currentScroll > 16.h
+                        ? Text(
+                            'MEDRESE',
+                            style: FontManager.impact.copyWith(
+                                color: Colors.white, letterSpacing: 2),
+                          )
+                        : const SizedBox(),
+                    flexibleSpace: scrollviewAppbar(),
+                  ),
+                  SliverToBoxAdapter(
+                    child: ListView(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          SizedBox(
+                            height: 2.h,
                           ),
-                          child: SizedBox(
-                            height: 6.h,
-                            width: 66.w,
-                            child: Center(
-                              child: Text(
-                                "PRODUCTS_LIST".tr(context),
-                                textAlign: TextAlign.center,
-                                style: FontManager.kumbhSansBold.copyWith(
-                                  color: Colors.white,
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.bold,
+                          Container(
+                            margin: EdgeInsets.symmetric(horizontal: 2.w),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                new BoxShadow(
+                                  // spreadRadius: 0,
+                                  offset: Offset(0, 0),
+                                  color: Colors.white.withOpacity(.4),
+                                  blurRadius: 20.0,
+                                ),
+                              ],
+                            ),
+                            child: Card(
+                              margin: EdgeInsets.symmetric(horizontal: 2.w),
+                              color: Colors.white.withOpacity(0.7),
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              child: SizedBox(
+                                height: 6.h,
+                                width: 66.w,
+                                child: Center(
+                                  child: Text(
+                                    "PRODUCTS_LIST".tr(context),
+                                    textAlign: TextAlign.center,
+                                    style: FontManager.kumbhSansBold.copyWith(
+                                      color: Colors.white,
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                      ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: state.products.length,
-                          itemBuilder: (context, index) {
-                            return SizedBox(
-                              height: 7.h + 20.w,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Padding(
-                                      padding: EdgeInsets.all(0.4.h),
-                                      child: ConstrainedBox(
-                                          constraints: BoxConstraints(
-                                            minWidth: 35.w,
-                                            maxWidth: 35.w,
-                                            maxHeight: 20.h,
-                                            minHeight: 20.h,
+                          ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: state.products.length,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(12)),
+                                    border: Border.all(
+                                      color: HexColor('#90579B'),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(10)),
+                                      border: Border.all(
+                                        color: HexColor('#EA4B6F'),
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Container(
+                                          margin: EdgeInsets.all(2.w),
+                                          width: 35.w,
+                                          height: 25.h,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                            border: Border.all(
+                                              color: HexColor('#C53E5D'),
+                                              width: 3,
+                                            ),
                                           ),
-                                          child: state.products[index].image ==
-                                                  null
-                                              ? Image.asset(
-                                                  'assets/launcher/logo.png',
-                                                  scale: 15.0,
-                                                )
-                                              : Container(
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.white70,
+                                          child: CachedNetworkImage(
+                                            // cacheManager: Base,
+                                            fit: BoxFit.cover,
+                                            imageUrl: Network().baseUrl +
+                                                state.products[index].image!,
+                                            imageBuilder:
+                                                (context, imageProvider) {
+                                              return Stack(
+                                                alignment:
+                                                    Alignment.bottomCenter,
+                                                children: [
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                              25.0),
-                                                      border: Border.all(
-                                                          color: primaryColor)),
-                                                  height: 12.h + 13.w,
-                                                  child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              25.0),
-                                                      child: Image(
+                                                              28),
+                                                      image: DecorationImage(
+                                                        image: imageProvider,
                                                         fit: BoxFit.cover,
-                                                        image: NetworkImage(
-                                                            Network().baseUrl +
-                                                                state
-                                                                    .products[
-                                                                        index]
-                                                                    .image!),
-                                                        width: 35.w,
-                                                      )),
-                                                ))),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.37,
-                                        child: Padding(
-                                          padding: EdgeInsets.fromLTRB(
-                                              1.w, 1.h, 0, 0),
-                                          child: Row(
-                                            children: [
-                                              AutoSizeText(
-                                                state.products[index].name!,
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 13.sp,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    margin: EdgeInsets.only(
+                                                        bottom: .5.h),
+                                                    alignment: Alignment.center,
+                                                    width: 25.w,
+                                                    height: 5.6.h,
+                                                    decoration: BoxDecoration(
+                                                      boxShadow: [
+                                                        new BoxShadow(
+                                                          blurStyle:
+                                                              BlurStyle.outer,
+                                                          // spreadRadius: 0,
+                                                          offset: Offset(0, 0),
+
+                                                          color: Colors.black
+                                                              .withOpacity(1),
+                                                          blurRadius: 15.0,
+                                                        ),
+                                                      ],
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              30),
+                                                      color: Colors.white
+                                                          .withOpacity(.57),
+                                                    ),
+                                                    child: Text(
+                                                      toCurrencyString(
+                                                        '${state.products[index].price!}',
+                                                        trailingSymbol:
+                                                            widget.currency,
+                                                        useSymbolPadding: true,
+                                                      ),
+                                                      style: FontManager
+                                                          .kumbhSansBold
+                                                          .copyWith(
+                                                        fontSize: 12.sp,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                            placeholder: (context, url) =>
+                                                Center(
+                                              child: Padding(
+                                                padding: EdgeInsets.all(7),
+                                                child: Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    Image.asset(
+                                                        'assets/launcher/logo.png'),
+                                                    CircularProgressIndicator(),
+                                                  ],
                                                 ),
                                               ),
-                                              state.products[index].quantity ==
-                                                          0 ||
-                                                      state.products[index]
-                                                              .quantity ==
-                                                          null
-                                                  ? const SizedBox()
-                                                  : Text(
-                                                      "X ${state.products[index].quantity}")
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.37,
-                                        height: 9.h,
-                                        child: Padding(
-                                          padding: EdgeInsets.fromLTRB(
-                                              1.w, 1.h, 0, 0),
-                                          child: AutoSizeText(
-                                            "${state.products[index].description ?? state.products[index].name!}\n${DateFormat('dd/MM/yyyy').format(DateTime.parse(state.products[index].restaurantDatedProduct!.availableDate!))}",
-                                            style: TextStyle(
-                                              fontSize: 11.sp,
                                             ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    children: <Widget>[
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.fromLTRB(0, 1.h, 0, 0),
-                                        child: Text(
-                                          toCurrencyString(
-                                              '${state.products[index].price!}',
-                                              trailingSymbol: currency,
-                                              useSymbolPadding: true),
-                                          style: TextStyle(
-                                              fontSize: 11.sp,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      Padding(
-                                          padding: EdgeInsets.fromLTRB(
-                                              0.w, 2.h, 0, 0),
-                                          child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.white,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                )),
-                                            onPressed: () {
-                                              confirmationDialog(context, () {
-                                                BlocProvider.of<ProductsBloc>(
-                                                        context)
-                                                    .add(DeleteDayProductEvent(
-                                                        state.products[index]
-                                                            .id!,
-                                                        childId,
-                                                        accessToken,
-                                                        dayId));
-                                              },
-                                                  "PRODUCT_REMOVE_DAY_CONFIRMATION"
-                                                      .tr(context));
+                                            errorWidget: (context, url, error) {
+                                              return Container(
+                                                // color: Colors.red,
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 5.w,
+                                                    vertical: 1.h),
+                                                child: Opacity(
+                                                  opacity: 1,
+                                                  child: Stack(
+                                                    alignment:
+                                                        Alignment.bottomCenter,
+                                                    children: [
+                                                      Container(
+                                                        margin: EdgeInsets.only(
+                                                            top: .4.h),
+                                                        alignment:
+                                                            Alignment.center,
+                                                        width: 25.w,
+                                                        height: 5.6.h,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          boxShadow: [
+                                                            new BoxShadow(
+                                                              blurStyle:
+                                                                  BlurStyle
+                                                                      .outer,
+                                                              // spreadRadius: 0,
+                                                              offset:
+                                                                  Offset(0, 0),
+
+                                                              color: Colors
+                                                                  .black
+                                                                  .withOpacity(
+                                                                      1),
+                                                              blurRadius: 15.0,
+                                                            ),
+                                                          ],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(30),
+                                                          color: Colors.white
+                                                              .withOpacity(.57),
+                                                        ),
+                                                        child: Text(
+                                                          toCurrencyString(
+                                                              '${state.products[index].price!}',
+                                                              trailingSymbol:
+                                                                  widget
+                                                                      .currency,
+                                                              useSymbolPadding:
+                                                                  true),
+                                                          style: FontManager
+                                                              .kumbhSansBold
+                                                              .copyWith(
+                                                            fontSize: 12.sp,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Opacity(
+                                                        opacity: .6,
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  top: 2.h),
+                                                          child: Column(
+                                                            children: [
+                                                              Lottie.asset(
+                                                                  'assets/images/Desktop HD.json'),
+                                                              Text(
+                                                                'undefined image',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                style: FontManager
+                                                                    .dubaiRegular
+                                                                    .copyWith(
+                                                                  fontSize:
+                                                                      8.5.sp,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
                                             },
-                                            child: Text(
-                                              "PRODUCTS_LIST_DELETE"
-                                                  .tr(context),
-                                              style: TextStyle(
-                                                  color: Colors.red,
-                                                  fontSize: 15.sp),
+                                          ),
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            SizedBox(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.34,
+                                              child: Padding(
+                                                padding: EdgeInsets.fromLTRB(
+                                                    1.w, 1.h, 0, 0),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    AutoSizeText(
+                                                      '${state.products[index].name!}',
+                                                      style: FontManager
+                                                          .kumbhSansBold
+                                                          .copyWith(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 12.sp,
+                                                      ),
+                                                      wrapWords: true,
+                                                    ),
+                                                    state.products[index]
+                                                                    .quantity ==
+                                                                0 ||
+                                                            state
+                                                                    .products[
+                                                                        index]
+                                                                    .quantity ==
+                                                                null
+                                                        ? const SizedBox()
+                                                        : Text(
+                                                            " quantity : x${state.products[index].quantity}",
+                                                            style: FontManager
+                                                                .kumbhSansBold
+                                                                .copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                              fontSize: 12.sp,
+                                                              color: Colors
+                                                                  .white
+                                                                  .withOpacity(
+                                                                      .9),
+                                                            ),
+                                                          ),
+                                                  ],
+                                                ),
+                                              ),
                                             ),
-                                          ))
-                                    ],
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.34,
+                                              height: 9.h,
+                                              child: Padding(
+                                                padding: EdgeInsets.fromLTRB(
+                                                    1.w, 1.h, 0, 0),
+                                                child: AutoSizeText(
+                                                  "${state.products[index].description ?? state.products[index].name}\n${state.products[index].restaurantDatedProduct?.availableDate != null ? DateFormat('dd/MM/yyyy').format(DateTime.parse(state.products[index].restaurantDatedProduct!.availableDate!)) : ''}",
+                                                  style: FontManager
+                                                      .kumbhSansBold
+                                                      .copyWith(
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontSize: 12.sp,
+                                                    color: Colors.white
+                                                        .withOpacity(.9),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Column(
+                                          children: <Widget>[
+                                            Padding(
+                                                padding: EdgeInsets.fromLTRB(
+                                                    0.w, 2.h, 0, 0),
+                                                child: ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              HexColor(
+                                                                  '#F7F4F4'),
+                                                          fixedSize:
+                                                              Size.fromHeight(
+                                                                  6.h),
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        30),
+                                                          )),
+                                                  onPressed: () {
+                                                    confirmationDialog(context,
+                                                        () {
+                                                      BlocProvider.of<
+                                                                  ProductsBloc>(
+                                                              context)
+                                                          .add(DeleteDayProductEvent(
+                                                              state
+                                                                  .products[
+                                                                      index]
+                                                                  .id!,
+                                                              widget.childId,
+                                                              widget
+                                                                  .accessToken,
+                                                              widget.dayId));
+                                                    },
+                                                        "PRODUCT_REMOVE_DAY_CONFIRMATION"
+                                                            .tr(context));
+                                                  },
+                                                  child: Text(
+                                                    "PRODUCTS_LIST_DELETE"
+                                                        .tr(context),
+                                                    style: FontManager.impact
+                                                        .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      fontSize: 16.sp,
+                                                      color:
+                                                          HexColor('#C53E5D'),
+                                                    ),
+                                                  ),
+                                                ))
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ],
-                              ),
-                            );
-                          })
-                    ])),
-                AppbarWidget(
-                  offset: -42.h,
-                  offsetLogo: 1.h,
-                ),
-              ],
+                                );
+                              })
+                        ]),
+                  )
+                ],
+              ),
             );
           } else {
             return const SizedBox();
@@ -340,21 +603,23 @@ class BookedDayProducts extends StatelessWidget {
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
                           BlocProvider.of<ProductsBloc>(context).add(
-                              GetSchoolProductsByPriceEvent(childId,
-                                  accessToken, double.parse(maxPrice.text)));
+                              GetSchoolProductsByPriceEvent(
+                                  widget.childId,
+                                  widget.accessToken,
+                                  double.parse(maxPrice.text)));
                           Go.off(
                               context,
                               ProductSearch(
-                                accessToken: accessToken,
-                                childId: childId,
-                                currency: currency,
+                                accessToken: widget.accessToken,
+                                childId: widget.childId,
+                                currency: widget.currency,
                                 maxPrice: maxPrice.text,
-                                dayId: dayId,
-                                dayName: dayName,
+                                dayId: widget.dayId,
+                                dayName: widget.dayName,
                                 isWeekly: false,
                                 daysCount: null,
                                 weeklyBalance: null,
-                                childName: childName,
+                                childName: widget.childName,
                               ));
                         }
                       }),

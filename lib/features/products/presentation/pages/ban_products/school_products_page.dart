@@ -281,376 +281,385 @@ class MyPageState extends State<AddBannedProducts> {
                                 ),
                               ),
                               SizedBox(height: 1.h),
-                              Padding(
-                                padding: EdgeInsets.all(4.sp),
-                                child: ListView.separated(
-                                    separatorBuilder: (context, index) =>
-                                        Padding(padding: EdgeInsets.all(4.sp)),
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: state.products.length,
-                                    // itemComparator: (item1, item2) => item1.isMarket==item2.isMarket, // optional
-                                    // optional
+                              Visibility(
+                                visible: state.products.isNotEmpty,
+                                child: Padding(
+                                  padding: EdgeInsets.all(4.sp),
+                                  child: ListView.separated(
+                                      separatorBuilder: (context, index) =>
+                                          Padding(
+                                              padding: EdgeInsets.all(4.sp)),
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemCount: state.products.length,
+                                      // itemComparator: (item1, item2) => item1.isMarket==item2.isMarket, // optional
+                                      // optional
 
-                                    itemBuilder: (context, index) {
-                                      return SizedBox(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(12)),
-                                            border: Border.all(
-                                              color: HexColor('#90579B'),
-                                              width: 2,
-                                            ),
-                                          ),
+                                      itemBuilder: (context, index) {
+                                        return SizedBox(
                                           child: Container(
                                             decoration: BoxDecoration(
                                               borderRadius:
                                                   const BorderRadius.all(
-                                                      Radius.circular(10)),
+                                                      Radius.circular(12)),
                                               border: Border.all(
-                                                color: HexColor('#EA4B6F'),
-                                                width: 1.5,
+                                                color: HexColor('#90579B'),
+                                                width: 2,
                                               ),
                                             ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Container(
-                                                  margin: EdgeInsets.all(2.w),
-                                                  width: 35.w,
-                                                  height: 25.h,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            30),
-                                                    border: Border.all(
-                                                      color:
-                                                          HexColor('#C53E5D'),
-                                                      width: 3,
-                                                    ),
-                                                  ),
-                                                  child: CachedNetworkImage(
-                                                    // cacheManager: Base,
-                                                    fit: BoxFit.cover,
-                                                    imageUrl:
-                                                        Network().baseUrl +
-                                                            state
-                                                                .products[index]
-                                                                .image!,
-                                                    imageBuilder: (context,
-                                                        imageProvider) {
-                                                      return Stack(
-                                                        alignment: Alignment
-                                                            .bottomCenter,
-                                                        children: [
-                                                          Container(
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color:
-                                                                  Colors.white,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          28),
-                                                              image:
-                                                                  DecorationImage(
-                                                                image:
-                                                                    imageProvider,
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Container(
-                                                            margin:
-                                                                EdgeInsets.only(
-                                                                    bottom:
-                                                                        .5.h),
-                                                            alignment: Alignment
-                                                                .center,
-                                                            width: 25.w,
-                                                            height: 5.6.h,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              boxShadow: [
-                                                                new BoxShadow(
-                                                                  blurStyle:
-                                                                      BlurStyle
-                                                                          .outer,
-                                                                  // spreadRadius: 0,
-                                                                  offset:
-                                                                      Offset(
-                                                                          0, 0),
-
-                                                                  color: Colors
-                                                                      .black
-                                                                      .withOpacity(
-                                                                          1),
-                                                                  blurRadius:
-                                                                      15.0,
-                                                                ),
-                                                              ],
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          30),
-                                                              color: Colors
-                                                                  .white
-                                                                  .withOpacity(
-                                                                      .57),
-                                                            ),
-                                                            child: Text(
-                                                              toCurrencyString(
-                                                                  '${state.products[index].price!}',
-                                                                  trailingSymbol:
-                                                                      widget
-                                                                          .currency,
-                                                                  useSymbolPadding:
-                                                                      true),
-                                                              style: FontManager
-                                                                  .kumbhSansBold
-                                                                  .copyWith(
-                                                                fontSize: 12.sp,
-                                                                color: Colors
-                                                                    .black,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      );
-                                                    },
-                                                    placeholder:
-                                                        (context, url) =>
-                                                            Center(
-                                                      child: Padding(
-                                                        padding:
-                                                            EdgeInsets.all(7),
-                                                        child: Stack(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          children: [
-                                                            Image.asset(
-                                                                'assets/launcher/logo.png'),
-                                                            CircularProgressIndicator(),
-                                                          ],
-                                                        ),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(10)),
+                                                border: Border.all(
+                                                  color: HexColor('#EA4B6F'),
+                                                  width: 1.5,
+                                                ),
+                                              ),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Container(
+                                                    margin: EdgeInsets.all(2.w),
+                                                    width: 35.w,
+                                                    height: 25.h,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              30),
+                                                      border: Border.all(
+                                                        color:
+                                                            HexColor('#C53E5D'),
+                                                        width: 3,
                                                       ),
                                                     ),
-                                                    errorWidget:
-                                                        (context, url, error) {
-                                                      return Container(
-                                                        // color: Colors.red,
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal: 5.w,
-                                                                vertical: 1.h),
-                                                        child: Opacity(
-                                                          opacity: 1,
+                                                    child: CachedNetworkImage(
+                                                      // cacheManager: Base,
+                                                      fit: BoxFit.cover,
+                                                      imageUrl: Network()
+                                                              .baseUrl +
+                                                          state.products[index]
+                                                              .image!,
+                                                      imageBuilder: (context,
+                                                          imageProvider) {
+                                                        return Stack(
+                                                          alignment: Alignment
+                                                              .bottomCenter,
+                                                          children: [
+                                                            Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            28),
+                                                                image:
+                                                                    DecorationImage(
+                                                                  image:
+                                                                      imageProvider,
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Container(
+                                                              margin: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          .5.h),
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              width: 25.w,
+                                                              height: 5.6.h,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                boxShadow: [
+                                                                  new BoxShadow(
+                                                                    blurStyle:
+                                                                        BlurStyle
+                                                                            .outer,
+                                                                    // spreadRadius: 0,
+                                                                    offset:
+                                                                        Offset(
+                                                                            0,
+                                                                            0),
+
+                                                                    color: Colors
+                                                                        .black
+                                                                        .withOpacity(
+                                                                            1),
+                                                                    blurRadius:
+                                                                        15.0,
+                                                                  ),
+                                                                ],
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            30),
+                                                                color: Colors
+                                                                    .white
+                                                                    .withOpacity(
+                                                                        .57),
+                                                              ),
+                                                              child: Text(
+                                                                toCurrencyString(
+                                                                    '${state.products[index].price!}',
+                                                                    trailingSymbol:
+                                                                        widget
+                                                                            .currency,
+                                                                    useSymbolPadding:
+                                                                        true),
+                                                                style: FontManager
+                                                                    .kumbhSansBold
+                                                                    .copyWith(
+                                                                  fontSize:
+                                                                      12.sp,
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                      placeholder:
+                                                          (context, url) =>
+                                                              Center(
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.all(7),
                                                           child: Stack(
                                                             alignment: Alignment
-                                                                .bottomCenter,
+                                                                .center,
                                                             children: [
-                                                              Container(
-                                                                margin: EdgeInsets
-                                                                    .only(
-                                                                        top: .4
-                                                                            .h),
-                                                                alignment:
-                                                                    Alignment
-                                                                        .center,
-                                                                width: 25.w,
-                                                                height: 5.6.h,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  boxShadow: [
-                                                                    new BoxShadow(
-                                                                      blurStyle:
-                                                                          BlurStyle
-                                                                              .outer,
-                                                                      // spreadRadius: 0,
-                                                                      offset:
-                                                                          Offset(
-                                                                              0,
-                                                                              0),
-
-                                                                      color: Colors
-                                                                          .black
-                                                                          .withOpacity(
-                                                                              1),
-                                                                      blurRadius:
-                                                                          15.0,
-                                                                    ),
-                                                                  ],
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              30),
-                                                                  color: Colors
-                                                                      .white
-                                                                      .withOpacity(
-                                                                          .57),
-                                                                ),
-                                                                child: Text(
-                                                                  toCurrencyString(
-                                                                      '${state.products[index].price!}',
-                                                                      trailingSymbol:
-                                                                          widget
-                                                                              .currency,
-                                                                      useSymbolPadding:
-                                                                          true),
-                                                                  style: FontManager
-                                                                      .kumbhSansBold
-                                                                      .copyWith(
-                                                                    fontSize:
-                                                                        12.sp,
-                                                                    color: Colors
-                                                                        .black,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              Opacity(
-                                                                opacity: .6,
-                                                                child: Padding(
-                                                                  padding: EdgeInsets
-                                                                      .only(
-                                                                          top: 2
-                                                                              .h),
-                                                                  child: Column(
-                                                                    children: [
-                                                                      Lottie.asset(
-                                                                          'assets/images/Desktop HD.json'),
-                                                                      Text(
-                                                                        'undefined image',
-                                                                        textAlign:
-                                                                            TextAlign.center,
-                                                                        style: FontManager
-                                                                            .dubaiRegular
-                                                                            .copyWith(
-                                                                          fontSize:
-                                                                              8.5.sp,
-                                                                          color:
-                                                                              Colors.white,
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ),
+                                                              Image.asset(
+                                                                  'assets/launcher/logo.png'),
+                                                              CircularProgressIndicator(),
                                                             ],
                                                           ),
                                                         ),
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      top: 1.5.h),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: <Widget>[
-                                                      Container(
-                                                        width: 42.w,
-                                                        child: Padding(
+                                                      ),
+                                                      errorWidget: (context,
+                                                          url, error) {
+                                                        return Container(
+                                                          // color: Colors.red,
                                                           padding: EdgeInsets
-                                                              .fromLTRB(1.w,
-                                                                  1.h, 0, 0),
-                                                          child: AutoSizeText(
-                                                            state
-                                                                .products[index]
-                                                                .name!,
-                                                            style: FontManager
-                                                                .kumbhSansBold
-                                                                .copyWith(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 14.sp,
-                                                              color:
-                                                                  Colors.white,
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      5.w,
+                                                                  vertical:
+                                                                      1.h),
+                                                          child: Opacity(
+                                                            opacity: 1,
+                                                            child: Stack(
+                                                              alignment: Alignment
+                                                                  .bottomCenter,
+                                                              children: [
+                                                                Container(
+                                                                  margin: EdgeInsets
+                                                                      .only(
+                                                                          top: .4
+                                                                              .h),
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .center,
+                                                                  width: 25.w,
+                                                                  height: 5.6.h,
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    boxShadow: [
+                                                                      new BoxShadow(
+                                                                        blurStyle:
+                                                                            BlurStyle.outer,
+                                                                        // spreadRadius: 0,
+                                                                        offset: Offset(
+                                                                            0,
+                                                                            0),
+
+                                                                        color: Colors
+                                                                            .black
+                                                                            .withOpacity(1),
+                                                                        blurRadius:
+                                                                            15.0,
+                                                                      ),
+                                                                    ],
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            30),
+                                                                    color: Colors
+                                                                        .white
+                                                                        .withOpacity(
+                                                                            .57),
+                                                                  ),
+                                                                  child: Text(
+                                                                    toCurrencyString(
+                                                                        '${state.products[index].price!}',
+                                                                        trailingSymbol:
+                                                                            widget
+                                                                                .currency,
+                                                                        useSymbolPadding:
+                                                                            true),
+                                                                    style: FontManager
+                                                                        .kumbhSansBold
+                                                                        .copyWith(
+                                                                      fontSize:
+                                                                          12.sp,
+                                                                      color: Colors
+                                                                          .black,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                Opacity(
+                                                                  opacity: .6,
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: EdgeInsets
+                                                                        .only(
+                                                                            top:
+                                                                                2.h),
+                                                                    child:
+                                                                        Column(
+                                                                      children: [
+                                                                        Lottie.asset(
+                                                                            'assets/images/Desktop HD.json'),
+                                                                        Text(
+                                                                          'undefined image',
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                          style: FontManager
+                                                                              .dubaiRegular
+                                                                              .copyWith(
+                                                                            fontSize:
+                                                                                8.5.sp,
+                                                                            color:
+                                                                                Colors.white,
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 1.5.h),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: <Widget>[
+                                                        Container(
+                                                          width: 42.w,
+                                                          child: Padding(
+                                                            padding: EdgeInsets
+                                                                .fromLTRB(1.w,
+                                                                    1.h, 0, 0),
+                                                            child: AutoSizeText(
+                                                              state
+                                                                  .products[
+                                                                      index]
+                                                                  .name!,
+                                                              style: FontManager
+                                                                  .kumbhSansBold
+                                                                  .copyWith(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 14.sp,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      Container(
-                                                        width: 42.w,
-                                                        child: Padding(
-                                                          padding: EdgeInsets
-                                                              .fromLTRB(1.w,
-                                                                  1.h, 0, 0),
-                                                          child: AutoSizeText(
-                                                            state
-                                                                    .products[
-                                                                        index]
-                                                                    .description ??
-                                                                state
-                                                                    .products[
-                                                                        index]
-                                                                    .name!,
-                                                            style: FontManager
-                                                                .kumbhSansBold
-                                                                .copyWith(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .normal,
-                                                              fontSize: 12.sp,
-                                                              color: Colors
-                                                                  .white
-                                                                  .withOpacity(
-                                                                      .9),
+                                                        Container(
+                                                          width: 42.w,
+                                                          child: Padding(
+                                                            padding: EdgeInsets
+                                                                .fromLTRB(1.w,
+                                                                    1.h, 0, 0),
+                                                            child: AutoSizeText(
+                                                              state
+                                                                      .products[
+                                                                          index]
+                                                                      .description ??
+                                                                  state
+                                                                      .products[
+                                                                          index]
+                                                                      .name!,
+                                                              style: FontManager
+                                                                  .kumbhSansBold
+                                                                  .copyWith(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                fontSize: 12.sp,
+                                                                color: Colors
+                                                                    .white
+                                                                    .withOpacity(
+                                                                        .9),
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      SizedBox(height: 2.h),
-                                                    ],
+                                                        SizedBox(height: 2.h),
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                                Padding(
-                                                    padding:
-                                                        EdgeInsets.fromLTRB(
-                                                            2.w, 2.h, 0, 0),
-                                                    child: InkWell(
-                                                        onTap: () {
-                                                          setState(() {
-                                                            state
-                                                                    .products[index]
-                                                                    .selected =
-                                                                !state
-                                                                    .products[
-                                                                        index]
-                                                                    .selected;
-                                                          });
-                                                        },
-                                                        child: state
-                                                                .products[index]
-                                                                .selected
-                                                            ? Icon(
-                                                                Icons
-                                                                    .check_box_outlined,
-                                                                size: 25.sp,
-                                                                color: Colors
-                                                                    .white,
-                                                              )
-                                                            : Icon(
-                                                                Icons
-                                                                    .check_box_outline_blank_sharp,
-                                                                size: 25.sp,
-                                                                color: Colors
-                                                                    .white,
-                                                              ))),
-                                              ],
+                                                  Padding(
+                                                      padding:
+                                                          EdgeInsets.fromLTRB(
+                                                              2.w, 2.h, 0, 0),
+                                                      child: InkWell(
+                                                          onTap: () {
+                                                            setState(() {
+                                                              state
+                                                                      .products[
+                                                                          index]
+                                                                      .selected =
+                                                                  !state
+                                                                      .products[
+                                                                          index]
+                                                                      .selected;
+                                                            });
+                                                          },
+                                                          child: state
+                                                                  .products[
+                                                                      index]
+                                                                  .selected
+                                                              ? Icon(
+                                                                  Icons
+                                                                      .check_box_outlined,
+                                                                  size: 25.sp,
+                                                                  color: Colors
+                                                                      .white,
+                                                                )
+                                                              : Icon(
+                                                                  Icons
+                                                                      .check_box_outline_blank_sharp,
+                                                                  size: 25.sp,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ))),
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    }),
+                                        );
+                                      }),
+                                ),
                               ),
                             ]),
                       ),

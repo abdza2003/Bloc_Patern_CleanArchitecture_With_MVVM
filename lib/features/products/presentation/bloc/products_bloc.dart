@@ -78,8 +78,16 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
             (failure) =>
                 emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
             (schoolProducts) {
-          List<ProductModel> pm =
-              schoolProducts.restaurant! + schoolProducts.market!;
+          List<ProductModel> pm;
+          if (schoolProducts.restaurant != null &&
+              schoolProducts.market != null) {
+            pm = schoolProducts.restaurant! + schoolProducts.market!;
+          } else if (schoolProducts.restaurant != null) {
+            pm = schoolProducts.restaurant!;
+          } else {
+            pm = schoolProducts.market!;
+          }
+          // print('=====#####$pm');
           emit(LoadedProductsSchoolState(products: pm));
         });
       } else if (event is GetAllBannedProductsEvent) {
@@ -141,7 +149,8 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
             (failure) =>
                 emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
             (schoolProducts) {
-          emit(LoadedDayProductsState(products: schoolProducts));
+          print('==========${schoolProducts}');
+          return emit(LoadedDayProductsState(products: schoolProducts));
         });
       } else if (event is GetSchoolProductsByPriceEvent) {
         emit(LoadingState());
@@ -204,7 +213,10 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         failureOrProducts.fold(
             (failure) =>
                 emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
-            (products) => emit(LoadedBookedProductsState(products: products)));
+            (products) {
+          print('====2342===@#######======$products');
+          return emit(LoadedBookedProductsState(products: products));
+        });
       } else if (event is GetDatedProductsEvent) {
         emit(LoadingState());
         final failureOrProducts =
@@ -212,12 +224,16 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         failureOrProducts.fold(
             (failure) =>
                 emit(ErrorMsgState(message: _mapFailureToMessage(failure))),
-            (products) => emit(LoadedDatedProductsState(products: products)));
+            (products) {
+          print('=======324324####99======${products}');
+          return emit(LoadedDatedProductsState(products: products));
+          //  print('============${}');
+        });
       } else if (event is StoreDayBookedProductsEvent) {
         emit(LoadingState());
         final failureOrUnit = await storeDayBookedProductsUsecase(
             event.selectedProducts, event.accessToken);
-        print('=================${failureOrUnit}');
+        print('==============@########===${failureOrUnit}');
         failureOrUnit.fold(
             (failure) =>
                 emit(ErrorMsgState(message: _mapFailureToMessage(failure))),

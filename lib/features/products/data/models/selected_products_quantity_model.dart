@@ -2,9 +2,9 @@ import 'package:school_cafteria/features/products/domain/entities/selected_produ
 
 import '../../domain/entities/selected_products_quantity.dart';
 
-class SelectedProductsQuantityModel extends SelectedProductsQuantity
-{
-  SelectedProductsQuantityModel({super.dayId, super.productsIds, super.mealsIds,super.studentId});
+class SelectedProductsQuantityModel extends SelectedProductsQuantity {
+  SelectedProductsQuantityModel(
+      {super.dayId, super.productsIds, super.mealsIds, super.studentId});
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};

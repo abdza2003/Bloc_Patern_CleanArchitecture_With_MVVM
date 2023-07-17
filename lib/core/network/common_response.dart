@@ -10,7 +10,7 @@ class CommonResponse<T> {
     try {
       status = json["status"];
       if (status) {
-        json["data"]!=null?data = json["data"]:print("kaka");
+        json["data"] != null ? data = json["data"] : null;
       } else {
         error = json["error"];
       }

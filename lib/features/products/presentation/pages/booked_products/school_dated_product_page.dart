@@ -94,21 +94,22 @@ class MyPageState extends State<SchoolDatedProduct> {
       if (state is LoadingState) {
         return Scaffold(
             body: Container(
-          decoration: BoxDecoration(
-            color: HexColor('#51093C'),
-            image: DecorationImage(
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.4),
-                BlendMode.dstIn,
-              ),
-              image: const AssetImage(
-                'assets/images/back3.png',
-              ),
-            ),
-          ),
-          child: const LoadingWidget(),
-        ));
+                decoration: BoxDecoration(
+                  color: HexColor('#51093C'),
+                  image: DecorationImage(
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.4),
+                      BlendMode.dstIn,
+                    ),
+                    image: const AssetImage(
+                      'assets/images/back3.png',
+                    ),
+                  ),
+                ),
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                )));
       } else if (state is LoadedDatedProductsState) {
         if (state.products.isEmpty) {
           return Scaffold(body: const NoPageFound());
@@ -130,16 +131,33 @@ class MyPageState extends State<SchoolDatedProduct> {
                 for (var pr in state.products) {
                   if (pr.quantity != null && pr.quantity > 0) {
                     if (pr.isMarket == "true") {
-                      selectedProductsModel.productsIds!.add(
-                          ProductSelection(id: pr.id!, quantity: pr.quantity!));
+                      print('id : ${pr.productId}');
+                      print('quantity : ${pr.quantity}');
+                      print('date : ${pr.date}');
+                      print('scheduleId : ${pr.id!}');
+                      selectedProductsModel.productsIds!.add(ProductSelection(
+                        id: pr.productId!,
+                        quantity: pr.quantity!,
+                        date: '${pr.date}',
+                        scheduleId: pr.id!,
+                      ));
                     } else {
-                      selectedProductsModel.mealsIds!.add(
-                          ProductSelection(id: pr.id!, quantity: pr.quantity!));
+                      print('===is resturant@###======${pr.productId}');
+
+                      selectedProductsModel.mealsIds!.add(ProductSelection(
+                          id: pr.productId,
+                          quantity: pr.quantity!,
+                          date: '${pr.date}',
+                          scheduleId: pr.id!));
                     }
                   }
                 }
                 selectedProductsModel.studentId = widget.childId;
                 selectedProductsModel.dayId = widget.dayId;
+                print(
+                    '==============########${selectedProductsModel.studentId}');
+                print(
+                    '=====day id=========########${selectedProductsModel.dayId}');
                 BlocProvider.of<ProductsBloc>(context).add(
                     StoreDayBookedProductsEvent(
                         selectedProductsModel, widget.accessToken));
@@ -326,10 +344,11 @@ class MyPageState extends State<SchoolDatedProduct> {
                                                     child: CachedNetworkImage(
                                                       // cacheManager: Base,
                                                       fit: BoxFit.cover,
+
                                                       imageUrl: Network()
                                                               .baseUrl +
-                                                          state.products[index]
-                                                              .image!,
+                                                          '${state.products[index].image}',
+                                                      //! state.products[index].price!
                                                       imageBuilder: (context,
                                                           imageProvider) {
                                                         return Stack(

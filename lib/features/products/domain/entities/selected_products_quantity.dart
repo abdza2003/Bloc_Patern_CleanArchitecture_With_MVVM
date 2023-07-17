@@ -16,13 +16,17 @@ class SelectedProductsQuantity extends Equatable {
 class ProductSelection {
   int? id;
   int? quantity;
+  dynamic scheduleId;
+  dynamic date;
 
-  ProductSelection({this.id, this.quantity});
+  ProductSelection({this.id, this.quantity, this.scheduleId, this.date});
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['quantity'] = quantity;
+    data['schedule_id'] = scheduleId;
+    data['date'] = date;
     return data;
   }
 }
