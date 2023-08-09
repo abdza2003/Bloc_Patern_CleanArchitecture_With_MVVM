@@ -318,7 +318,7 @@ class MyPageState extends State<ProductSearch> {
                               : primaryColor,
                           title: currentScroll > 16.h
                               ? Text(
-                                  'MEDRESE',
+                                  'YES MEDRESE',
                                   style: FontManager.impact.copyWith(
                                       color: Colors.white, letterSpacing: 2),
                                 )

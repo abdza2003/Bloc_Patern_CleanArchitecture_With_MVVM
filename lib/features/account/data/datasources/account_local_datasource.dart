@@ -31,11 +31,13 @@ class AccountLocalDataSourceImpl implements AccountLocalDataSource {
     final jsonString = sharedPreferences.getString(CACHED_USER);
     if (jsonString != null) {
       final decodeJsonData = json.decode(jsonString);
-      UserModel userModel=UserModel.fromJson(decodeJsonData);
-      return  Future.value(userModel);
+      UserModel userModel = UserModel.fromJson(decodeJsonData);
+      return Future.value(userModel);
     } else {
       throw EmptyCacheException();
     }
   }
-
 }
+
+//todo : json.encode() هي تحويل البيانات الى نص 
+//todo : json.decode() هي ارجاع النص الى شكله الاصلي

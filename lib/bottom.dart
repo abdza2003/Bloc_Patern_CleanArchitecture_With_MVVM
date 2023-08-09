@@ -291,7 +291,7 @@ class BottomNavState extends State<BottomNav> {
                           : primaryColor,
                       title: currentScroll > 16.h
                           ? Text(
-                              'MEDRESE',
+                              'YES MEDRESE',
                               style: FontManager.impact.copyWith(
                                   color: Colors.white, letterSpacing: 2),
                             )

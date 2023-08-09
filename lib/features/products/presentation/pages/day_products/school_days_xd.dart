@@ -125,7 +125,7 @@ class _SchoolDays2State extends State<SchoolDays2> {
                             : primaryColor,
                         title: currentScroll > 16.h
                             ? Text(
-                                'MEDRESE',
+                                'YES MEDRESE',
                                 style: FontManager.impact.copyWith(
                                     color: Colors.white, letterSpacing: 2),
                               )
