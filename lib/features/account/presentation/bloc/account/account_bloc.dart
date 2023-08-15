@@ -127,10 +127,6 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           print('=================${failure}');
           emit(ErrorMsgState(message: _mapFailureToMessage(failure)));
         }, (user) {
-          print(
-              '=======${user.childern![0].name}==========${user.childern![0].isActive}');
-          print(
-              '=======${user.childern![1].name}==========${user.childern![1].isActive}');
           emit(LoggedInState(user: user));
         });
       } else if (event is RegisterTokenEvent) {

@@ -254,11 +254,20 @@ class _HistoryProductsPageState extends State<HistoryProductsPage> {
                                                 child: CachedNetworkImage(
                                                   // cacheManager: Base,
                                                   fit: BoxFit.cover,
-                                                  imageUrl: Network().baseUrl +
+                                                  imageUrl: state
+                                                              .historyProduct[
+                                                                  index]
+                                                              .product!
+                                                              .image !=
+                                                          null
+                                                      ? '${Network().baseUrl + state.historyProduct[index].product!.image}'
+                                                      : "",
+
+                                                  /* Network().baseUrl +
                                                       state
                                                           .historyProduct[index]
                                                           .product!
-                                                          .image,
+                                                          .image, */
                                                   imageBuilder:
                                                       (context, imageProvider) {
                                                     return Stack(

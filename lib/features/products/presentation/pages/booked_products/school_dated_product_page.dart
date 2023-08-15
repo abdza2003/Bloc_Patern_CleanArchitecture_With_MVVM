@@ -345,9 +345,13 @@ class MyPageState extends State<SchoolDatedProduct> {
                                                       // cacheManager: Base,
                                                       fit: BoxFit.cover,
 
-                                                      imageUrl: Network()
-                                                              .baseUrl +
-                                                          '${state.products[index].image}',
+                                                      imageUrl: state
+                                                                  .products[
+                                                                      index]
+                                                                  .image !=
+                                                              null
+                                                          ? '${Network().baseUrl + state.products[index].image}'
+                                                          : "",
                                                       //! state.products[index].price!
                                                       imageBuilder: (context,
                                                           imageProvider) {

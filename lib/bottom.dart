@@ -269,10 +269,10 @@ class BottomNavState extends State<BottomNav> {
                     for (var school in widget.user.schools!) {
                       accessTokens.add(school.accessToken!);
                     }
-                    setState(() {});
                     BlocProvider.of<AccountBloc>(context)
                         .add(RefreshEvent(accessTokens));
 
+                    setState(() {});
                     return Future.value();
                   }
                 },

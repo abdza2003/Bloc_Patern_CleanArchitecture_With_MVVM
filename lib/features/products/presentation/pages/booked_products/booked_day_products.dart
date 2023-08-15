@@ -265,8 +265,11 @@ class _BookedDayProductsState extends State<BookedDayProducts> {
                                           child: CachedNetworkImage(
                                             // cacheManager: Base,
                                             fit: BoxFit.cover,
-                                            imageUrl: Network().baseUrl +
-                                                state.products[index].image!,
+                                            imageUrl: state.products[index]
+                                                        .image !=
+                                                    null
+                                                ? '${Network().baseUrl + state.products[index].image}'
+                                                : "",
                                             imageBuilder:
                                                 (context, imageProvider) {
                                               return Stack(
