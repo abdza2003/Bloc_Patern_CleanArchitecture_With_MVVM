@@ -117,8 +117,8 @@
     "PRODUCT_REMOVE_BAN_CONFIRMATION": "You are about to remove these products from ban section !",
     "PRODUCT_ADD_BAN_CONFIRMATION": "You are about to add these products to ban section !",
     "PRODUCT_WEEKLY_TITLE": "Select Products for Entier Week",
-    "DATED_BOOKED_NOT_AVAILABLE": "Not Available"
-
+    "DATED_BOOKED_NOT_AVAILABLE": "Not Available",
+    "policy_file" :"In order to read the privacy file, click here ."
 
 
 

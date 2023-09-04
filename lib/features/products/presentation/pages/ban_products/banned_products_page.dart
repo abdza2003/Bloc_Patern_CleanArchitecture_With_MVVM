@@ -590,7 +590,7 @@ class _BannedProductsState extends State<BannedProducts> {
                                                                       '#F7F4F4'),
                                                               fixedSize: Size
                                                                   .fromHeight(
-                                                                      6.h),
+                                                                      2.h),
                                                               shape:
                                                                   RoundedRectangleBorder(
                                                                 borderRadius:
@@ -626,7 +626,19 @@ class _BannedProductsState extends State<BannedProducts> {
                                                         style: FontManager
                                                             .impact
                                                             .copyWith(
-                                                          fontSize: 15.sp,
+                                                          fontSize: AppLocalizations.of(
+                                                                          context)!
+                                                                      .locale!
+                                                                      .languageCode ==
+                                                                  'en'
+                                                              ? 14.sp
+                                                              : AppLocalizations.of(
+                                                                              context)!
+                                                                          .locale!
+                                                                          .languageCode ==
+                                                                      'ar'
+                                                                  ? 14.sp
+                                                                  : 8.sp,
                                                           fontWeight:
                                                               FontWeight.normal,
                                                           color: HexColor(

@@ -62,8 +62,16 @@ class _MyAppState extends State<MyApp> {
 
   void getLocale() async {
     SharedPreferences local = await SharedPreferences.getInstance();
-    setLocale(Locale(local.getString("lang") ??
-        (Platform.localeName.split('_')[0] == 'ar' ? 'ar' : 'en')));
+    setLocale(
+      Locale(
+        local.getString("lang") ??
+            (Platform.localeName.split('_')[0] == 'ar'
+                ? 'ar'
+                : Platform.localeName.split('_')[0] == 'tr'
+                    ? "tr"
+                    : 'en'),
+      ),
+    );
   }
 
   // This widget is the root of your application.

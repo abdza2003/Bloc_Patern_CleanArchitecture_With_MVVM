@@ -117,6 +117,7 @@
   "PRODUCT_REMOVE_BAN_CONFIRMATION": "انت على وشك ازالة المنتجات المختارة من قائمة الحظر",
   "PRODUCT_ADD_BAN_CONFIRMATION": "انت على وشك ادخال هذه المنتجات في قائمة الحظر",
   "PRODUCT_WEEKLY_TITLE": "اختر منتجات لكافة ايام الاسبوع",
-  "DATED_BOOKED_NOT_AVAILABLE": "غير متوفر"
+  "DATED_BOOKED_NOT_AVAILABLE": "غير متوفر",
+  "policy_file" : " من اجل قراءة ملف الخصوصية , اضغط هنا ."
 
 }

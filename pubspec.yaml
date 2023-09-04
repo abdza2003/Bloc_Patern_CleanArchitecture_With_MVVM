@@ -133,3 +133,4 @@ flutter:
     - assets/launcher/
     - assets/lang/en.json
     - assets/lang/ar.json
+    - assets/lang/tr.json
